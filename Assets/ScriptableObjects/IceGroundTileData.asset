@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52257c2d7f8a0e4294f16abce02c913, type: 3}
+  m_Name: IceGroundTileData
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: 57b67d63e0fee06479acfea6b2105e90, type: 2}
+  walkingSpeed: 10
