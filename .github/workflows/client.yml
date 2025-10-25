@@ -12,17 +12,17 @@ on:
 
 jobs:
   build:
-    name: Build for ${{ matrix.targetPlatform }}
-    runs-on: ${{ matrix.os }}
+    name: Client Build for ${{ matrix.targetPlatform }}
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          - os: macos
             targetPlatform: StandaloneOSX # Build a macOS standalone (Apple silicon + Intel 64-bit).
-          - os: windows-latest
+          - os: windows
             targetPlatform: StandaloneWindows64 # Build a Windows 64-bit standalone.
-          - os: ubuntu-latest
+          - os: ubuntu
             targetPlatform: StandaloneLinux64 # Build a Linux 64-bit standalone.  
     steps:
       # Checkout
@@ -40,7 +40,7 @@ jobs:
           restore-keys: Library-
 
       # Build
-      - name: Build server
+      - name: Build Client
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -50,11 +50,10 @@ jobs:
           projectPath: .
           unityVersion: 6000.2.8f1
           targetPlatform: ${{ matrix.targetPlatform }}
-          buildName: Fun Run Server
-          customParameters: -standaloneBuildSubtarget Server
+          buildName: Fun Run Client
 
       # Output
       - uses: actions/upload-artifact@v4
         with:
-          name: LinuxServerBuild
-          path: build/StandaloneLinux64
+          name: Fun Run ${{ matrix.targetPlatform }}  
+          path: build/${{ matrix.targetPlatform }}
