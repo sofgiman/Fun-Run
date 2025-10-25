@@ -1,11 +1,10 @@
-name: Unity CI/CD
+name: Client Build
 
 on:
   workflow_dispatch:  # Enables manual trigger
   push:
     branches:
       - main
-      - feature/add-cicd
   pull_request:
     branches:
       - main
