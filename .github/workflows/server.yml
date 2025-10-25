@@ -1,0 +1,60 @@
+name: Server Build
+
+on:
+  workflow_dispatch:  # Enables manual trigger
+  push:
+    branches:
+      - main
+      - feature/add-cicd
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build for ${{ matrix.targetPlatform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            targetPlatform: StandaloneOSX # Build a macOS standalone (Apple silicon + Intel 64-bit).
+          - os: windows-latest
+            targetPlatform: StandaloneWindows64 # Build a Windows 64-bit standalone.
+          - os: ubuntu-latest
+            targetPlatform: StandaloneLinux64 # Build a Linux 64-bit standalone.  
+    steps:
+      # Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0  # Fetch all history for accurate git info
+
+      # Cache
+      - uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
+
+      # Build
+      - name: Build Server
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: .
+          unityVersion: 6000.2.8f1
+          targetPlatform: ${{ matrix.targetPlatform }}
+          buildName: Fun Run Server
+          customParameters: -standaloneBuildSubtarget Server
+
+      # Output
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LinuxServerBuild
+          path: build/StandaloneLinux64
