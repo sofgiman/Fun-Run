@@ -12,21 +12,29 @@ on:
 
 jobs:
   build:
+    name: Build for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneOSX # Build a macOS standalone (Apple silicon + Intel 64-bit).
+          - StandaloneWindows64 # Build a Windows 64-bit standalone.
+          - StandaloneLinux64 # Build a Linux 64-bit standalone.
     steps:
       # Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
+          fetch-depth: 0  # Fetch all history for accurate git info
 
       # Cache
       - uses: actions/cache@v3
         with:
           path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
 
       # Build
       - name: Build server
@@ -38,7 +46,8 @@ jobs:
         with:
           projectPath: .
           unityVersion: 6000.2.8f1
-          targetPlatform: StandaloneLinux64
+          targetPlatform: ${{ matrix.targetPlatform }}
+          buildName: Fun Run Server
           customParameters: -standaloneBuildSubtarget Server
 
       # Output
