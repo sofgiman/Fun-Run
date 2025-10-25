@@ -13,14 +13,17 @@ on:
 jobs:
   build:
     name: Build for ${{ matrix.targetPlatform }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        targetPlatform:
-          - StandaloneOSX # Build a macOS standalone (Apple silicon + Intel 64-bit).
-          - StandaloneWindows64 # Build a Windows 64-bit standalone.
-          - StandaloneLinux64 # Build a Linux 64-bit standalone.
+        include:
+          - os: macos-latest
+            targetPlatform: StandaloneOSX # Build a macOS standalone (Apple silicon + Intel 64-bit).
+          - os: windows-latest
+            targetPlatform: StandaloneWindows64 # Build a Windows 64-bit standalone.
+          - os: ubuntu-latest
+            targetPlatform: StandaloneLinux64 # Build a Linux 64-bit standalone.  
     steps:
       # Checkout
       - name: Checkout repository
