@@ -77,7 +77,7 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-              docker build -t ghcr.io/${{ github.repository }}/fun-run-server:latest -f docker/Linux/Dockerfile .
+              docker build -t ghcr.io/fun-run-idan/fun-run-server:latest -f docker/Linux/Dockerfile .
 
       # Optionally login and push to GitHub Container Registry
       - name: Log in to GitHub Container Registry
