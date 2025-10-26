@@ -1,8 +1,9 @@
 # Use a minimal runtime base image
 FROM ubuntu:22.04
 
+
 # Install dependencies required for Unity headless builds
-RUN apt-get update 
+RUN apt-get update & apt-get install -y libsqlite3-0 
 
 # Copy the Unity build into the container
 WORKDIR /server
