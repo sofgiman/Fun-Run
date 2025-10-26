@@ -89,4 +89,4 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}/funrun-server:latest
+          docker push ghcr.io/fun-run-idan/fun-run-server:latest
