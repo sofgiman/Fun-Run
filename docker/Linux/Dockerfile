@@ -9,7 +9,7 @@ WORKDIR /server
 COPY Fun-Run-Server-ubuntu/ .
 
 # Make the binary executable (sometimes lost in artifact)
-RUN chmod +x "Fun Run Serve"
+RUN chmod +x "Fun Run Server"
 
 # Expose the port your
 EXPOSE 7777
