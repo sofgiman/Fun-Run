@@ -22,6 +22,9 @@ jobs:
             targetPlatform: StandaloneWindows64 # Build a Windows 64-bit standalone.
           - os: ubuntu
             targetPlatform: StandaloneLinux64 # Build a Linux 64-bit standalone.  
+    outputs:
+      targetPlatform: ${{ matrix.targetPlatform }}
+      os: ${{ matrix.os }}
     steps:
       # Checkout
       - name: Checkout repository 
@@ -56,3 +59,34 @@ jobs:
         with:
           name: Fun Run Server ${{ matrix.os }}
           path: build/${{ matrix.targetPlatform }}
+
+
+  dockerize:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Download Linux artifact (only for Linux build)
+      - name: Download Linux build artifact
+        if: needs.build.outputs.targetPlatform == 'StandaloneLinux64'
+        uses: actions/download-artifact@v4
+        with:
+          name: Fun Run Server ${{ needs.build.outputs.os }}
+          path: ./build/StandaloneLinux64
+
+      # Build Docker image
+      - name: Build Docker image
+        run: |
+              docker build -t ghcr.io/${{ github.repository }}/fun-run-server:latest -f docker/Linux/Dockerfile .
+
+      # Optionally login and push to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository }}/funrun-server:latest
