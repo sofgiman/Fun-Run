@@ -30,12 +30,12 @@ jobs:
           lfs: true
           fetch-depth: 0  # Fetch all history for accurate git info
 
-      # Cache
-    #  - uses: actions/cache@v3
-    #    with:
-    #      path: Library
-    #      key: Library-${{ matrix.targetPlatform }}
-    #      restore-keys: Library-
+      #  Cache:
+      - uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Server-${{ matrix.targetPlatform }}
+          restore-keys: Library-
 
       # Build
       - name: Build Server
