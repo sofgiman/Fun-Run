@@ -76,7 +76,11 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-              docker build -t ghcr.io/fun-run-idan/fun-run-server:latest -f docker/Linux/Dockerfile .
+              # Lowercase GITHUB_REPOSITORY
+              IMAGE_NAME_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+              
+              # Build Docker image
+              docker build -t ghcr.io/$IMAGE_NAME_LOWER/fun-run-server:latest -f docker/Linux/Dockerfile .
 
       # Optionally login and push to GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -88,4 +92,6 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/fun-run-idan/fun-run-server:latest
+              # Lowercase GITHUB_REPOSITORY
+              IMAGE_NAME_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+              docker push ghcr.io/$IMAGE_NAME_LOWER/fun-run-server:latest
