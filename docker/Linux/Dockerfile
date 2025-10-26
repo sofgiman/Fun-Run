@@ -6,7 +6,7 @@ RUN apt-get update
 
 # Copy the Unity build into the container
 WORKDIR /server
-COPY build/StandaloneLinux64/ .
+COPY Fun-Run-Server-ubuntu/ .
 
 # Make the binary executable (sometimes lost in artifact)
 RUN chmod +x "Fun Run Serve"

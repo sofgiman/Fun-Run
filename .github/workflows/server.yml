@@ -11,68 +11,67 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build for ${{ matrix.targetPlatform }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows
-            targetPlatform: StandaloneWindows64 # Build a Windows 64-bit standalone.
-          - os: ubuntu
-            targetPlatform: StandaloneLinux64 # Build a Linux 64-bit standalone.  
-    outputs:
-      targetPlatform: ${{ matrix.targetPlatform }}
-      os: ${{ matrix.os }}
-    steps:
-      # Checkout
-      - name: Checkout repository 
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-          fetch-depth: 0  # Fetch all history for accurate git info
-
-      #  Cache:
-      - uses: actions/cache@v3
-        with:
-          path: Library
-          key: Library-Server-${{ matrix.targetPlatform }}
-          restore-keys: Library-
-
-      # Build
-      - name: Build Server
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          projectPath: .
-          unityVersion: 6000.2.8f1
-          targetPlatform: ${{ matrix.targetPlatform }}
-          buildName: Fun Run Server
-          customParameters: -standaloneBuildSubtarget Server
-
-      # Output
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Fun Run Server ${{ matrix.os }}
-          path: build/${{ matrix.targetPlatform }}
-
-
+#  build:
+#    name: Build for ${{ matrix.targetPlatform }}
+#    runs-on: ubuntu-latest
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        include:
+#          - os: windows
+#            targetPlatform: StandaloneWindows64 # Build a Windows 64-bit standalone.
+#          - os: ubuntu
+#            targetPlatform: StandaloneLinux64 # Build a Linux 64-bit standalone.  
+#    outputs:
+#      targetPlatform: ${{ matrix.targetPlatform }}
+#      os: ${{ matrix.os }}
+#    steps:
+#      # Checkout
+#      - name: Checkout repository 
+#        uses: actions/checkout@v4
+#        with:
+#          lfs: true
+#          fetch-depth: 0  # Fetch all history for accurate git info
+#
+#      #  Cache:
+#      - uses: actions/cache@v3
+#        with:
+#          path: Library
+#          key: Library-Server-${{ matrix.targetPlatform }}
+#          restore-keys: Library-
+#
+#      # Build
+#      - name: Build Server
+#        uses: game-ci/unity-builder@v4
+#        env:
+#          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+#          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+#          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+#        with:
+#          projectPath: .
+#          unityVersion: 6000.2.8f1
+#          targetPlatform: ${{ matrix.targetPlatform }}
+#          buildName: Fun Run Server
+#          customParameters: -standaloneBuildSubtarget Server
+#
+#      # Output
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: Fun Run Server ${{ matrix.os }}
+#          path: build/${{ matrix.targetPlatform }}
+#
+#
   dockerize:
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       # Download Linux artifact (only for Linux build)
-      - name: Download Linux build artifact
-        if: needs.build.outputs.targetPlatform == 'StandaloneLinux64'
-        uses: actions/download-artifact@v4
-        with:
-          name: Fun Run Server ${{ needs.build.outputs.os }}
-          path: ./build/StandaloneLinux64
+     # - name: Download Linux build artifact
+     #   if: needs.build.outputs.targetPlatform == 'StandaloneLinux64'
+     #   uses: actions/download-artifact@v4
+     #   with:
+     #     name: Fun Run Server ${{ needs.build.outputs.os }}
+     #     path: ./build/StandaloneLinux64
 
       # Build Docker image
       - name: Build Docker image
