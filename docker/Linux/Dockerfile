@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 
 
 # Install dependencies required for Unity headless builds
-RUN apt-get update & apt-get install -y libsqlite3-0 
+RUN apt-get update && apt-get install -y libsqlite3-0 && rm -rf /var/lib/apt/lists/*
 
 # Copy the Unity build into the container
 WORKDIR /server
