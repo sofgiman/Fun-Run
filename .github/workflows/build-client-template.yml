@@ -1,4 +1,4 @@
-name: Unity Build Template
+name: Unity Client Build Template
 
 on:
   workflow_call:
@@ -33,8 +33,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: Library
-          key: Library-Server-${{ inputs.targetPlatform }}
-          restore-keys: Library-
+          key: Library-Client-${{ inputs.targetPlatform }}
+          restore-keys: Library-Client-${{ inputs.targetPlatform }}
 
       - name: Build Unity Project
         uses: game-ci/unity-builder@v4
@@ -45,11 +45,10 @@ jobs:
         with:
           projectPath: .
           targetPlatform: ${{ inputs.targetPlatform }}
-          buildName: Fun Run Server
-          customParameters: -standaloneBuildSubtarget Server
+          buildName: Fun Run Client
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Fun Run Server ${{ inputs.os }}
+          name: Fun Run ${{ inputs.os }}
           path: build/${{ inputs.targetPlatform }}
