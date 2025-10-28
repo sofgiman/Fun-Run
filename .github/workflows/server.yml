@@ -48,8 +48,16 @@ jobs:
               # Lowercase GITHUB_REPOSITORY
               IMAGE_NAME_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
               
+
+              # Determine tag
+              if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+                TAG_NAME=${GITHUB_REF_NAME}
+              else
+                TAG_NAME="latest"
+              fi
+
               # Build Docker image
-               docker build -t ghcr.io/${IMAGE_NAME_LOWER}/fun-run-server:latest -f docker/Linux/Dockerfile .
+               docker build -t ghcr.io/${IMAGE_NAME_LOWER}/fun-run-server:${TAG_NAME} -f docker/Linux/Dockerfile .
 
       # Optionally login and push to GitHub Container Registry
       - name: Log in to GitHub Container Registry
