@@ -35,7 +35,7 @@ jobs:
         with:
           path: Library
           key: Library-Server-${{ inputs.targetPlatform }}
-          restore-keys: Library-
+          restore-keys: Library-Server-${{ inputs.targetPlatform }}
 
       - name: Build Unity Project
         uses: game-ci/unity-builder@v4
