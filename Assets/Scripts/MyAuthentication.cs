@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using Mono.Data.Sqlite;
+using System;     
+using System.IO;   
+
 
 //  Class to manage authentication on server 
 public class MyAuthentication : MonoBehaviour
@@ -16,11 +19,39 @@ public class MyAuthentication : MonoBehaviour
         // register handlres for sign up and sign in requests from clients
         NetworkServer.RegisterHandler<SignUpMessage>(OnSignUp);
         NetworkServer.RegisterHandler<SignInMessage>(OnSignIn);
+
+         // Load .env variables first
+        EnvLoader.Load();
+
+        // Get DATA_PATH env var or fallback to persistent data path
+        string dataPath = Environment.GetEnvironmentVariable("FUN_RUN_DATA_PATH") 
+                          ?? "./";
+
+        // Build database path
+        string dbFile = Path.Combine(dataPath, "MyDatabase.sqlite");
       
-        m_dbConnection = new SqliteConnection("Data Source=MyDatabase.sqlite;Version=3;");
+        m_dbConnection = new SqliteConnection($"Data Source={dbFile};Version=3;");
         m_dbConnection.Open();
 
+        CreateUsersTable();
+
         print("connected to sql");            
+    }
+
+    private void CreateUsersTable()
+    {
+        using (var cmd = m_dbConnection.CreateCommand())
+        {
+            cmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS users (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Username TEXT,
+                    Password TEXT
+                );
+            ";
+            cmd.ExecuteNonQuery();
+            Debug.Log("Users table ensured.");
+        }
     }
 
     // Called on server on sign up request from clients
@@ -46,7 +77,7 @@ public class MyAuthentication : MonoBehaviour
     private void OnSignIn(NetworkConnection conn, SignInMessage sim){
         string username = sim.username;
         string password = sim.password;
-        string userInDbString = "SELECT * FROM 'users' WHERE Username = '"+username+"'" +" AND password = '"+password+"'" ;  // checking if user is in the db
+        string userInDbString = "SELECT * FROM 'users' WHERE Username = '"+username+"'" +" AND Password = '"+password+"'" ;  // checking if user is in the db
         SqliteCommand usernameInDbCommand = new SqliteCommand(userInDbString, m_dbConnection);
         System.Object reader = usernameInDbCommand.ExecuteScalar();
         if (reader==null){  // if reader is null then the user isn't in db (not created)
@@ -55,4 +86,15 @@ public class MyAuthentication : MonoBehaviour
         else
             conn.Send<SignInSuccessMessage>(new SignInSuccessMessage());  // sending succes message to client
     } 
+
+    private void OnApplicationQuit()
+    {
+        if (m_dbConnection != null)
+        {
+            m_dbConnection.Close();
+            m_dbConnection.Dispose();
+            m_dbConnection = null;
+            Debug.Log("Database connection closed.");
+        }
+    }
 }
