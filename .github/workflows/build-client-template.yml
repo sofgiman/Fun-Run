@@ -2,6 +2,7 @@ name: Unity Build Template
 
 on:
   workflow_call:
+    inputs:
       os:
         required: true
         type: string
