@@ -13,14 +13,14 @@ on:
 
 jobs:
   linux_build: 
-    uses: ./.github/workflows/build-template.yml
+    uses: ./.github/workflows/build-server-template.yml
     with:
       os: "ubuntu"
       targetPlatform: "StandaloneLinux64"
     
 
   windows_build:
-    uses: ./.github/workflows/build-template.yml
+    uses: ./.github/workflows/build-server-template.yml
     with:
       os: "windows"
       targetPlatform: "StandaloneWindows64"
