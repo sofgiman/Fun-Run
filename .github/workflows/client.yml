@@ -3,57 +3,32 @@ name: Client Build
 on:
   workflow_dispatch:  # Enables manual trigger
   push:
+    tags:
+     - '*'
     branches:
       - main
-      - feature/add-cicd
   pull_request:
     branches:
       - main
 
 jobs:
-  build:
-    name: Client Build for ${{ matrix.targetPlatform }}
-    runs-on: ${{ matrix.os }}-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos
-            targetPlatform: StandaloneOSX # Build a macOS standalone (Apple silicon + Intel 64-bit).
-          - os: windows
-            targetPlatform: StandaloneWindows64 # Build a Windows 64-bit standalone.
-          - os: ubuntu
-            targetPlatform: StandaloneLinux64 # Build a Linux 64-bit standalone.  
-    steps:
-      # Checkout
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-          fetch-depth: 0  # Fetch all history for accurate git info
+  mac_build:
+    uses: ./.github/workflows/build-client-template.yml
+    with:
+      os: "macos"
+      targetPlatform: "StandaloneOSX"
+    secrets: inherit
 
-      # Cache
-#      - uses: actions/cache@v3
-#        with:
-#          path: Library
-#          key: Library-${{ matrix.targetPlatform }}
-#          restore-keys: Library-
+  linux_build: 
+    uses: ./.github/workflows/build-client-template.yml
+    with:
+      os: "ubuntu"
+      targetPlatform: "StandaloneLinux64"
+    secrets: inherit
 
-      # Build
-      - name: Build Client
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          projectPath: .
-          unityVersion: 6000.2.8f1
-          targetPlatform: ${{ matrix.targetPlatform }}
-          buildName: Fun Run Client
-
-      # Output
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Fun Run ${{ matrix.os }}  
-          path: build/${{ matrix.targetPlatform }}
+  windows_build:
+    uses: ./.github/workflows/build-client-template.yml
+    with:
+      os: "windows"
+      targetPlatform: "StandaloneWindows64"
+    secrets: inherit

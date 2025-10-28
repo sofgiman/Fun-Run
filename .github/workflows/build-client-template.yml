@@ -1,0 +1,54 @@
+name: Unity Client Build Template
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      targetPlatform:
+        required: true
+        type: string
+    outputs:
+      os: 
+        value: ${{ jobs.build.outputs.os }}
+      targetPlatform:
+        value: ${{ jobs.build.outputs.targetPlatform }}
+
+jobs:
+  build:
+    name: Build for ${{ inputs.targetPlatform }}
+    runs-on: ubuntu-latest
+    outputs:
+      targetPlatform: ${{ inputs.targetPlatform }}
+      os: ${{ inputs.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Cache Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Client-${{ inputs.targetPlatform }}
+          restore-keys: Library-Client-${{ inputs.targetPlatform }}
+
+      - name: Build Unity Project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: .
+          targetPlatform: ${{ inputs.targetPlatform }}
+          buildName: Fun Run Client
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fun Run ${{ inputs.os }}
+          path: build/${{ inputs.targetPlatform }}
