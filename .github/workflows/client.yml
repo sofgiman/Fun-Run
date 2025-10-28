@@ -3,8 +3,11 @@ name: Client Build
 on:
   workflow_dispatch:  # Enables manual trigger
   push:
+    tags:
+     - '*'
     branches:
       - main
+      - feature/add-cicd
   pull_request:
     branches:
       - main
