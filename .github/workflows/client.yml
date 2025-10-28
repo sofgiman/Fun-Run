@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     name: Client Build for ${{ matrix.targetPlatform }}
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
