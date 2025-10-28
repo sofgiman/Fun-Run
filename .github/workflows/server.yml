@@ -25,6 +25,7 @@ jobs:
     with:
       os: "windows"
       targetPlatform: "StandaloneWindows64"
+    secrets: inherit
 
   dockerize:
     needs: linux_build
