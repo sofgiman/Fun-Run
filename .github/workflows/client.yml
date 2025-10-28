@@ -17,6 +17,8 @@ jobs:
     with:
       os: "macos"
       targetPlatform: "StandaloneOSX"
+      # add tag if build is tag triggered 
+      buildName: ${{ github.ref_type == 'tag' && format('Fun Run Client {0}', github.ref_name) || 'Fun Run Client' }}
     secrets: inherit
 
   linux_build: 
@@ -24,6 +26,8 @@ jobs:
     with:
       os: "ubuntu"
       targetPlatform: "StandaloneLinux64"
+      # add tag if build is tag triggered 
+      buildName: ${{ github.ref_type == 'tag' && format('Fun Run Client {0}', github.ref_name) || 'Fun Run Client' }}
     secrets: inherit
 
   windows_build:
@@ -31,4 +35,6 @@ jobs:
     with:
       os: "windows"
       targetPlatform: "StandaloneWindows64"
+      # add tag if build is tag triggered 
+      buildName: ${{ github.ref_type == 'tag' && format('Fun Run Client {0}', github.ref_name) || 'Fun Run Client' }}
     secrets: inherit

@@ -64,4 +64,11 @@ jobs:
               # Lowercase GITHUB_REPOSITORY
               IMAGE_NAME_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
 
-              docker push ghcr.io/${IMAGE_NAME_LOWER}/fun-run-server:latest
+              # Determine tag
+              if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+                TAG_NAME=${GITHUB_REF_NAME}
+              else
+                TAG_NAME="latest"
+              fi
+
+              docker push ghcr.io/${IMAGE_NAME_LOWER}/fun-run-server:${TAG_NAME}
