@@ -33,11 +33,11 @@ jobs:
           fetch-depth: 0  # Fetch all history for accurate git info
 
       # Cache
-#      - uses: actions/cache@v3
-#        with:
-#          path: Library
-#          key: Library-${{ matrix.targetPlatform }}
-#          restore-keys: Library-
+      - uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Client-${{ matrix.targetPlatform }}
+          restore-keys: Library-
 
       # Build
       - name: Build Client
@@ -48,7 +48,6 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: .
-          unityVersion: 6000.2.8f1
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: Fun Run Client
 
