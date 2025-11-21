@@ -13,6 +13,9 @@ on:
     paths:
       - 'terraform/infrastructure/dev/**'
     
+permissions:
+  id-token: write
+  
 jobs:
   terraform:
     runs-on: ubuntu-latest
