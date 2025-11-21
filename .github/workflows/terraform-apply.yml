@@ -2,8 +2,8 @@ name: Terraform Depoly Test
 
 on:
   push:   
-    path:
-    - '*'
+    paths:
+    - 'terraform/infrastructre/test/**'
   workflow_dispatch:
   pull_request:
     branches:
