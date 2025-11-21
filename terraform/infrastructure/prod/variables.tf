@@ -4,9 +4,9 @@ variable "project" {
 }
 
 variable "environment" {
-  description = "Environment name (test, prod)"
+  description = "Environment name (dev, prod)"
   type        = string
-  default     = "test"
+  default     = "prod"
 }
 
 variable "region" {
