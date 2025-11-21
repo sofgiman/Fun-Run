@@ -1,9 +1,9 @@
-name: Terraform Depoly Test
+name: Terraform Deploy Prod
 
 on:
   push:   
-    # paths:
-    # - 'terraform/infrastructre/test/**'
+    paths:
+      - terraform/infrastructure/prod/**
   workflow_dispatch:
   pull_request:
     branches:
@@ -21,20 +21,22 @@ jobs:
         with:
           terraform_version: 1.14.0
 
-      - name: Terraform Init
-        working-directory: terraform/infrastructre/test
-        run: terraform init
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TEST }}
+          role-to-assume: ${{ secrets.AWS_ROLE_PROD }}
           aws-region: us-east-1
 
+      - name: Terraform Init
+        working-directory: terraform/infrastructure/prod
+        run: terraform init
+
       - name: Terraform Plan
-        working-directory: terraform/infrastructre/test/
+        working-directory: terraform/infrastructure/prod
         run: terraform plan -out=tfplan
 
+      # apply only if pull request
       - name: Terraform Apply
-        working-directory: terraform/infrastructre/test
+        if: github.event_name == 'pull_request'
+        working-directory: terraform/infrastructure/prod
         run: terraform apply -auto-approve tfplan
