@@ -5,6 +5,9 @@ on:
     path:
     - 'terraform/infrastructre/test/**'
     workflow_dispatch:
+  pull_request:
+    branches:
+      - main
     
 jobs:
   terraform:
