@@ -1,6 +1,7 @@
 variable "project" {
   description = "fun-run"
   type        = string
+  default     = "fun-run"
 }
 
 variable "environment" {
