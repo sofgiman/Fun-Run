@@ -3,7 +3,7 @@ name: Terraform Deploy Dev
 on:
   push:   
     paths:
-      - terraform/infrastructure/dev/**
+      - 'terraform/infrastructure/dev/**'
   workflow_dispatch:
   pull_request:
     branches:

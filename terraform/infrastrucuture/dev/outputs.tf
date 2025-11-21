@@ -12,3 +12,4 @@ output "internet_gateway_id" {
   description = "The ID of the internet gateway"
   value       = module.network.internet_gateway_id
 }
+

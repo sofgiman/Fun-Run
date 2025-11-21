@@ -3,7 +3,7 @@ name: Terraform Deploy Prod
 on:
   push:   
     paths:
-      - terraform/infrastructure/prod/**
+      - 'terraform/infrastructure/prod/**'
   workflow_dispatch:
   pull_request:
     branches:
