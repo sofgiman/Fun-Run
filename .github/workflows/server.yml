@@ -33,21 +33,29 @@ jobs:
     secrets: inherit
 
   dockerize:
-    needs: linux_build
-    runs-on: ubuntu-latest
-    outputs:
-      IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
-      TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
 
-    steps:
+    # needs: linux_build
+    # runs-on: ubuntu-latest
+    # outputs:
+    #   IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
+    #   TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
+
+    # steps:
+    #   - uses: actions/checkout@v4
+    #   # Download Linux artifact (only for Linux build)
+    #   - name: Download Linux build artifact
+    #     if: ${{ needs.linux_build.outputs.targetPlatform == 'StandaloneLinux64' }}
+    #     uses: actions/download-artifact@v4
+    #     with:
+    #       name: Fun Run Server ${{ needs.linux_build.outputs.os }}
+    #       path: ./build/StandaloneLinux64
+
+      runs-on: ubuntu-latest
+      outputs:
+        IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
+        TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
+      steps:
       - uses: actions/checkout@v4
-      # Download Linux artifact (only for Linux build)
-      - name: Download Linux build artifact
-        if: ${{ needs.linux_build.outputs.targetPlatform == 'StandaloneLinux64' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: Fun Run Server ${{ needs.linux_build.outputs.os }}
-          path: ./build/StandaloneLinux64
 
       # Compute variables once
       - name: Compute variables
@@ -58,7 +66,7 @@ jobs:
 
           # Determine tag
           TAG=$(basename "$GITHUB_REF_NAME")
-          echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=${TAG}" >> $GITHUB_OUTPUT
           
 
       # Build Docker image
@@ -66,6 +74,7 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ steps.vars.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }} \
             -f docker/Linux/Dockerfile .
+        working-directory: Fun-Run-Server-ubuntu
 
   push:
     runs-on: ubuntu-latest
