@@ -18,6 +18,6 @@ module "network" {
   environment         = var.environment
   region              = var.region
   vpc_cidr            = var.vpc_cidr
-  public_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
+  public_subnet_cidrs = var.public_subnet_cidrs
 }
 
