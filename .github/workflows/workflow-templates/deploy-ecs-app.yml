@@ -1,0 +1,41 @@
+name: Deploy ECS App Template
+
+
+on:
+  workflow_call:
+    inputs:
+      image_uri:
+        required: true
+        type: string
+
+jobs:
+  terraform-apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.14.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_DEV }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        working-directory: terraform/server/dev
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform/server/dev
+        run: terraform plan -out=tfplan \
+              -var="image_uri=${{ inputs.image_uri }}"
+
+      - name: Terraform Apply
+        working-directory: terraform/server/dev
+        run: terraform apply -auto-approve tfplan \
+              -var="image_uri=${{ inputs.image_uri }}"
