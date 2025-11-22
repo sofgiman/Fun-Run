@@ -96,7 +96,7 @@ jobs:
     needs: push
     uses: ./.github/workflows/deploy-ecs-app-template.yml
     with:
-      docker_image: ghcr.io/${{ needs.push.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ needs.push.outputs.TAG_NAME }}
+      image_uri: ghcr.io/${{ needs.push.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ needs.push.outputs.TAG_NAME }}
     secrets: inherit
 
 
