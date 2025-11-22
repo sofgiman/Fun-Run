@@ -62,7 +62,8 @@ jobs:
         id: vars
         run: |
           # Lowercase repository name
-          echo "IMAGE_NAME_LOWER=$(echo '${GITHUB_REPOSITORY}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          IMAGE_NAME_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME_LOWER=${IMAGE_NAME_LOWER}" >> $GITHUB_OUTPUT
 
           # Determine tag
           TAG=$(basename "$GITHUB_REF_NAME")
