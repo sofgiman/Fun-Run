@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - main
+      - 'main'
     paths:
       - 'terraform/infrastructure/prod/**'
 
@@ -29,6 +29,14 @@ jobs:
           terraform_version: 1.14.0
 
       - name: Configure AWS Credentials
+        if: github.event_name != 'push'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_PLAN }}
+          aws-region: us-east-1
+
+      - name: Configure AWS Credentials
+        if: github.event_name == 'push'
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_PROD }}
@@ -44,6 +52,6 @@ jobs:
 
       # apply only if pull request
       - name: Terraform Apply
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'push'
         working-directory: terraform/infrastructure/prod
         run: terraform apply -auto-approve tfplan
