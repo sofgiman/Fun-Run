@@ -74,7 +74,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t ghcr.io/${{ steps.vars.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }} \
-            -f docker/Linux/Dockerfile ./Fun-Run-Server-ubuntu
+            -f docker/Linux/Dockerfile .
 
   push:
     runs-on: ubuntu-latest
