@@ -9,6 +9,9 @@ on:
       targetPlatform:
         required: true
         type: string
+      buildName:
+        default: "Fun Run Client"
+        type: string
     outputs:
       os: 
         value: ${{ jobs.build.outputs.os }}
@@ -45,7 +48,7 @@ jobs:
         with:
           projectPath: .
           targetPlatform: ${{ inputs.targetPlatform }}
-          buildName: Fun Run Client
+          buildName: ${{ inputs.buildName }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
