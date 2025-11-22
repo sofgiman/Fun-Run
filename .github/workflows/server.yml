@@ -98,3 +98,4 @@ jobs:
     with:
       docker_image: ghcr.io/${{ needs.push.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ needs.push.outputs.TAG_NAME }}
     secrets: inherit
+
