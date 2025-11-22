@@ -96,19 +96,9 @@ jobs:
 
   deploy:
     needs: dockerize
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_PLAN }}
-          aws-region: us-east-1
-
-  # deploy:
-  #   needs: dockerize
-  #   uses: ./.github/workflows/deploy-ecs-app-template.yml
-  #   with:
-  #     image_uri: ghcr.io/${{ needs.dockerize.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ needs.dockerize.outputs.TAG_NAME }}
-  #   secrets: inherit
+    uses: ./.github/workflows/deploy-ecs-app-template.yml
+    with:
+      image_uri: ghcr.io/${{ needs.dockerize.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ needs.dockerize.outputs.TAG_NAME }}
+    secrets: inherit
 
 

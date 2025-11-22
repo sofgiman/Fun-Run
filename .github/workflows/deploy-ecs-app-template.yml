@@ -1,5 +1,7 @@
 name: Deploy ECS App Template
 
+permissions:
+  id-token: write
 
 on:
   workflow_call:
