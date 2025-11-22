@@ -49,7 +49,6 @@ resource "aws_route_table" "public" {
   }
 }
 
-
 # Associate route table with public subnets
 resource "aws_route_table_association" "public" {
   count          = length(aws_subnet.public)
