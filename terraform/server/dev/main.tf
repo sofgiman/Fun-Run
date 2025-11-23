@@ -19,7 +19,7 @@ module "ecs_app" {
   execution_role_arn = data.terraform_remote_state.infra.outputs.ecs_execution_role_arn
 
   service_name     = var.service_name
-  docker_image     = ""
+  image_uri        = var.image_uri
   cpu              = var.cpu
   memory           = var.memory
   container_port   = var.server_port
