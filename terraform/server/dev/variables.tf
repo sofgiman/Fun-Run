@@ -30,6 +30,14 @@ variable "image_uri" {
   type        = string
 }
 
+# To allow redeploy of a task when using same image 
+variable "git_commit_hash" {
+  description = "The image tag hash"
+  type        = string
+  default     = ""
+}
+
+
 variable "cpu" {
   type    = string
   default = "256"

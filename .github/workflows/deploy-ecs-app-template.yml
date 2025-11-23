@@ -9,9 +9,12 @@ on:
       image_uri:
         required: true
         type: string
+      git_commit_hash:
+        type: string
       isApply: 
         required: true
         type: boolean
+      
 
 jobs:
   terraform-apply:
@@ -47,7 +50,8 @@ jobs:
         working-directory: terraform/server/dev
         run: |
           terraform plan -out=tfplan \
-            -var="image_uri=${{ inputs.image_uri }}"
+            -var="image_uri=${{ inputs.image_uri }}" \
+            -var="git_commit_hash=${{ inputs.git_commit_hash }}"
 
       - name: Terraform Apply
         if:  ${{ inputs.isApply }}

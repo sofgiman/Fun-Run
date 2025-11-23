@@ -51,10 +51,20 @@ variable "service_name" {
   default     = "server"
 }
 
+
 variable "image_uri" {
   description = "The image URI to deploy"
   type        = string
 }
+
+# To allow redeploy of a task when using same image 
+variable "git_commit_hash" {
+  description = "The image tag hash"
+  type        = string
+  default     = ""
+}
+
+
 variable "cpu" {
   type    = string
   default = "256"

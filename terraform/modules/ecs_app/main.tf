@@ -32,6 +32,10 @@ resource "aws_ecs_task_definition" "this" {
         }
       }
 
+      dockerLabels = {
+        "git_commit_hash" = var.git_commit_hash
+      }
+
       readonlyRootFilesystem = var.readonlyRootFilesystem
     }
   ])
