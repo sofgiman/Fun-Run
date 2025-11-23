@@ -27,3 +27,7 @@ variable "public_subnet_cidrs" {
   default     = ["10.0.0.0/24", "10.0.1.0/24"]
 }
 
+variable "enable_execute_command" {
+  type    = bool
+  default = false
+}
