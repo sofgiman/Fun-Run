@@ -28,8 +28,10 @@ module "ecs_app" {
   protocol               = var.server_protocol
   readonlyRootFilesystem = false
   desired_count          = var.desired_count
+  enable_execute_command = true
   assign_public_ip       = var.assign_public_ip
   log_retention_days     = 30
+
 }
 
 

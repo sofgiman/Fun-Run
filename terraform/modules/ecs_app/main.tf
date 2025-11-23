@@ -9,6 +9,7 @@ resource "aws_ecs_task_definition" "this" {
   memory                   = var.memory
   execution_role_arn       = var.execution_role_arn
 
+
   container_definitions = jsonencode([
     {
       name      = var.service_name
@@ -38,11 +39,12 @@ resource "aws_ecs_task_definition" "this" {
 
 # ECS Service
 resource "aws_ecs_service" "this" {
-  name            = "${var.project}-${var.environment}-server"
-  cluster         = var.ecs_cluster_id
-  task_definition = aws_ecs_task_definition.this.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                   = "${var.project}-${var.environment}-server"
+  cluster                = var.ecs_cluster_id
+  task_definition        = aws_ecs_task_definition.this.arn
+  desired_count          = var.desired_count
+  launch_type            = "FARGATE"
+  enable_execute_command = var.enable_execute_command
 
   network_configuration {
 
@@ -80,4 +82,43 @@ resource "aws_security_group" "ecs_service_sg" {
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/ecs/${var.project}-${var.environment}-server"
   retention_in_days = var.log_retention_days
+}
+
+
+
+
+# If allow to exec into the container
+data "aws_iam_policy_document" "ecs_exec" {
+  count = var.enable_execute_command ? 1 : 0
+
+  statement {
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions   = ["logs:DescribeLogGroups"]
+    resources = [aws_cloudwatch_log_group.this.arn]
+  }
+
+  statement {
+    actions = [
+      "logs:CreateLogStream",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents"
+    ]
+    resources = ["${aws_cloudwatch_log_group.this.arn}:*"]
+  }
+}
+
+resource "aws_iam_role_policy" "ecs_exec_policy" {
+  count  = var.enable_execute_command ? 1 : 0
+  name   = "ecs-exec-policy"
+  role   = var.execution_role_arn
+  policy = data.aws_iam_policy_document.ecs_exec[0].json
 }

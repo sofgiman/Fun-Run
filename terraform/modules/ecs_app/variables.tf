@@ -88,6 +88,13 @@ variable "desired_count" {
   description = "The number of ECS tasks to run."
 }
 
+# Allow to exec into the container
+variable "enable_execute_command" {
+  type    = bool
+  default = false
+}
+
+
 # Whether to assign a public IP to the service
 variable "assign_public_ip" {
   type        = bool
@@ -99,3 +106,4 @@ variable "log_retention_days" {
   type    = number
   default = 30
 }
+
