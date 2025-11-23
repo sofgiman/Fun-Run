@@ -9,8 +9,10 @@ data "terraform_remote_state" "infra" {
 
 
 module "ecs_app" {
-  source  = "../../modules/ecs_app"
-  project = var.project
+  source      = "../../modules/ecs_app"
+  project     = var.project
+  environment = var.environment
+  region      = var.region
 
   vpc_id            = data.terraform_remote_state.infra.outputs.vpc_id
   public_subnets_id = data.terraform_remote_state.infra.outputs.public_subnets
@@ -18,12 +20,16 @@ module "ecs_app" {
   ecs_cluster_id     = data.terraform_remote_state.infra.outputs.ecs_cluster_id
   execution_role_arn = data.terraform_remote_state.infra.outputs.ecs_execution_role_arn
 
-  service_name     = var.service_name
-  image_uri        = var.image_uri
-  cpu              = var.cpu
-  memory           = var.memory
-  container_port   = var.server_port
-  desired_count    = var.desired_count
-  assign_public_ip = var.assign_public_ip
+  service_name           = var.service_name
+  image_uri              = var.image_uri
+  cpu                    = var.cpu
+  memory                 = var.memory
+  container_port         = var.server_port
+  protocol               = var.server_protocol
+  readonlyRootFilesystem = false
+  desired_count          = var.desired_count
+  assign_public_ip       = var.assign_public_ip
+  log_retention_days     = 30
 }
+
 
