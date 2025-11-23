@@ -53,6 +53,5 @@ jobs:
 
       # apply only if pull request or manual
       - name: Terraform Apply
-        if: github.event_name == 'push'
         working-directory: terraform/infrastructure/dev
         run: terraform apply -auto-approve tfplan
