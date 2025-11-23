@@ -50,6 +50,7 @@ jobs:
             -var="image_uri=${{ inputs.image_uri }}"
 
       - name: Terraform Apply
+        if:  ${{ inputs.isApply }}
         working-directory: terraform/server/dev
         run: |
             terraform apply -auto-approve tfplan 
