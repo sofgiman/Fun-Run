@@ -18,8 +18,7 @@ jobs:
       os: "ubuntu"
       targetPlatform: "StandaloneLinux64"
     secrets: inherit
-    
-
+  
   
   windows_build:
     uses: ./.github/workflows/build-server-template.yml
@@ -50,7 +49,7 @@ jobs:
         if: ${{ needs.linux_build.outputs.targetPlatform == 'StandaloneLinux64' }}
         uses: actions/download-artifact@v4
         with:
-          name: Fun Run Server ${{ needs.linux_build.outputs.os }}
+          name: Fun-Run-Server-${{ needs.linux_build.outputs.os }}
           path: ./build/StandaloneLinux64
 
       # runs-on: ubuntu-latest
@@ -77,7 +76,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t ghcr.io/${{ steps.vars.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }} \
-            -f docker/Linux/Dockerfile .
+            -f docker/Linux/Dockerfile ./build/StandaloneLinux64
 
       # Login to GitHub Container Registry
       - name: Log in to GitHub Container Registry
