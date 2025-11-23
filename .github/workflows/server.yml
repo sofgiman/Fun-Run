@@ -34,28 +34,28 @@ jobs:
 
   dockerize:
 
-    needs: linux_build
-    runs-on: ubuntu-latest
-    outputs:
-      IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
-      TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
+    # needs: linux_build
+    # runs-on: ubuntu-latest
+    # outputs:
+    #   IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
+    #   TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
 
-    steps:
+    # steps:
+    #   - uses: actions/checkout@v4
+    #   # Download Linux artifact (only for Linux build)
+    #   - name: Download Linux build artifact
+    #     if: ${{ needs.linux_build.outputs.targetPlatform == 'StandaloneLinux64' }}
+    #     uses: actions/download-artifact@v4
+    #     with:
+    #       name: Fun Run Server ${{ needs.linux_build.outputs.os }}
+    #       path: ./build/StandaloneLinux64
+
+      runs-on: ubuntu-latest
+      outputs:
+        IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
+        TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
+      steps:
       - uses: actions/checkout@v4
-      # Download Linux artifact (only for Linux build)
-      - name: Download Linux build artifact
-        if: ${{ needs.linux_build.outputs.targetPlatform == 'StandaloneLinux64' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: Fun Run Server ${{ needs.linux_build.outputs.os }}
-          path: ./build/StandaloneLinux64
-
-      # runs-on: ubuntu-latest
-      # outputs:
-      #   IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
-      #   TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
-      # steps:
-      # - uses: actions/checkout@v4
 
       # Compute variables once
       - name: Compute variables
@@ -86,14 +86,13 @@ jobs:
 
       # push docker image
       - name: Push Docker Image
-        if: |
-          github.event_name == 'push' && (
-            (github.ref_type == 'branch' && github.ref_name == 'dev') ||
-            (github.ref_type == 'tag')
-          )
+        # if: |
+        #   github.event_name == 'push' && (
+        #     (github.ref_type == 'branch' && github.ref_name == 'dev') ||
+        #     (github.ref_type == 'tag')
+        #   )
         run: |
           docker push ghcr.io/${{ steps.vars.outputs.IMAGE_NAME_LOWER}}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }}
-
 
   deploy:
     needs: dockerize
