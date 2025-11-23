@@ -10,6 +10,12 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
 # Network Module
 variable "vpc_id" {
   type = string
@@ -61,6 +67,21 @@ variable "container_port" {
   description = "The port on which the container will listen."
 }
 
+# Container port to expose
+variable "protocol" {
+  type    = string
+  default = "udp"
+}
+
+
+# Needed to be true when sqlite is on file system
+# false when mounting efs for sqlite
+variable "readonlyRootFilesystem" {
+  type    = bool
+  default = true
+}
+
+
 variable "desired_count" {
   type        = number
   default     = 1
@@ -72,4 +93,9 @@ variable "assign_public_ip" {
   type        = bool
   default     = true
   description = "Whether to assign a public IP to the ECS service tasks."
+}
+
+variable "log_retention_days" {
+  type    = number
+  default = 30
 }

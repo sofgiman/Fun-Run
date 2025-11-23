@@ -2,7 +2,7 @@
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "this" {
-  family                   = "${var.project}-server"
+  family                   = "${var.project}-${var.environment}-server"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.cpu
@@ -18,15 +18,27 @@ resource "aws_ecs_task_definition" "this" {
         {
           containerPort = var.container_port
           hostPort      = var.container_port
+          protocol      = var.protocol
         }
       ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.this.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+
+      readonlyRootFilesystem = var.readonlyRootFilesystem
     }
   ])
 }
 
 # ECS Service
 resource "aws_ecs_service" "this" {
-  name            = "${var.project}-server"
+  name            = "${var.project}-${var.environment}-server"
   cluster         = var.ecs_cluster_id
   task_definition = aws_ecs_task_definition.this.arn
   desired_count   = var.desired_count
@@ -40,6 +52,8 @@ resource "aws_ecs_service" "this" {
   }
 }
 
+
+# Security Group
 resource "aws_security_group" "ecs_service_sg" {
   name        = "${var.project}-${var.environment}-ecs-service-sg"
   description = "Security group for ${var.project}-${var.environment} service"
@@ -60,4 +74,10 @@ resource "aws_security_group" "ecs_service_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+# Cloudwatch Log Group
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "/ecs/${var.project}-${var.environment}-server"
+  retention_in_days = var.log_retention_days
 }

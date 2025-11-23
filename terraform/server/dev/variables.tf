@@ -4,6 +4,18 @@ variable "project" {
   default     = "fun-run"
 }
 
+variable "environment" {
+  description = "Environment name (dev, prod)"
+  type        = string
+  default     = "dev"
+}
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
 # Server Container Specs
 
 # Name of the ECS service
@@ -32,6 +44,19 @@ variable "memory" {
 variable "server_port" {
   type    = number
   default = 7777
+}
+
+# Container port to expose
+variable "server_protocol" {
+  type    = string
+  default = "udp"
+}
+
+# Needed to be true when sqlite is on file system
+# false when mounting efs for sqlite
+variable "readonlyRootFilesystem" {
+  type    = bool
+  default = true
 }
 
 variable "desired_count" {
