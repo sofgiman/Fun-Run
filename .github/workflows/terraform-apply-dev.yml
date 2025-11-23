@@ -1,57 +1,57 @@
-name: Terraform Deploy Dev
+# name: Terraform Deploy Dev
 
-on:
-  push:
-    branches:
-      - 'dev'
-    paths:
-      - 'terraform/infrastructure/dev/**'
-  workflow_dispatch:
-  pull_request:
-    branches:
-      - 'dev'
-    paths:
-      - 'terraform/infrastructure/dev/**'
+# on:
+#   push:
+#     branches:
+#       - 'dev'
+#     paths:
+#       - 'terraform/infrastructure/dev/**'
+#   workflow_dispatch:
+#   pull_request:
+#     branches:
+#       - 'dev'
+#     paths:
+#       - 'terraform/infrastructure/dev/**'
     
-permissions:
-  id-token: write
+# permissions:
+#   id-token: write
   
-jobs:
-  terraform:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+# jobs:
+#   terraform:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.14.0
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_version: 1.14.0
 
-      - name: Configure AWS Credentials
-        if: github.event_name == 'pull_request'
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_PLAN }}
-          aws-region: us-east-1
+#       - name: Configure AWS Credentials
+#         if: github.event_name == 'pull_request'
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           role-to-assume: ${{ secrets.AWS_ROLE_PLAN }}
+#           aws-region: us-east-1
 
-      - name: Configure AWS Credentials
-        if: github.event_name != 'pull_request'
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_DEV }}
-          aws-region: us-east-1
+#       - name: Configure AWS Credentials
+#         if: github.event_name != 'pull_request'
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           role-to-assume: ${{ secrets.AWS_ROLE_DEV }}
+#           aws-region: us-east-1
 
-      - name: Terraform Init
-        working-directory: terraform/infrastructure/dev
-        run: terraform init
+#       - name: Terraform Init
+#         working-directory: terraform/infrastructure/dev
+#         run: terraform init
 
-      - name: Terraform Plan
-        working-directory: terraform/infrastructure/dev
-        run: terraform plan -out=tfplan
+#       - name: Terraform Plan
+#         working-directory: terraform/infrastructure/dev
+#         run: terraform plan -out=tfplan
 
 
-      # apply only if pull request or manual
-      - name: Terraform Apply
-        working-directory: terraform/infrastructure/dev
-        run: terraform apply -auto-approve tfplan
+#       # apply only if pull request or manual
+#       - name: Terraform Apply
+#         working-directory: terraform/infrastructure/dev
+#         run: terraform apply -auto-approve tfplan
