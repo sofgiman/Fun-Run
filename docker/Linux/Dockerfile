@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y libsqlite3-0 && rm -rf /var/lib/apt/lis
 
 # Copy the Unity build into the container
 WORKDIR /server
-COPY Fun-Run-Server-ubuntu/ .
+COPY . .
 
 # Make the binary executable (sometimes lost in artifact)
 RUN chmod +x "Fun Run Server"
