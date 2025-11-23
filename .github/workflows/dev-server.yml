@@ -18,8 +18,7 @@ jobs:
       os: "ubuntu"
       targetPlatform: "StandaloneLinux64"
     secrets: inherit
-    
-
+  
   
   windows_build:
     uses: ./.github/workflows/build-server-template.yml
@@ -42,6 +41,7 @@ jobs:
     outputs:
       IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
       TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
+      COMMIT_HASH: ${{ steps.vars.outputs.COMMIT_HASH }}
 
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
         if: ${{ needs.linux_build.outputs.targetPlatform == 'StandaloneLinux64' }}
         uses: actions/download-artifact@v4
         with:
-          name: Fun Run Server ${{ needs.linux_build.outputs.os }}
+          name: Fun-Run-Server-${{ needs.linux_build.outputs.os }}
           path: ./build/StandaloneLinux64
 
       # runs-on: ubuntu-latest
@@ -72,12 +72,13 @@ jobs:
           TAG=$(basename "$GITHUB_REF_NAME")
           echo "TAG_NAME=${TAG}" >> $GITHUB_OUTPUT
           
+          echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       # Build Docker image
       - name: Build Docker Image
         run: |
           docker build -t ghcr.io/${{ steps.vars.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }} \
-            -f docker/Linux/Dockerfile .
+            -f docker/Linux/Dockerfile ./build/StandaloneLinux64
 
       # Login to GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -102,6 +103,7 @@ jobs:
     uses: ./.github/workflows/deploy-ecs-app-template.yml
     with:
       image_uri: ghcr.io/${{ needs.dockerize.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ needs.dockerize.outputs.TAG_NAME }}
+      git_commit_hash: ${{ needs.dockerize.outputs.COMMIT_HASH }}
       isApply: ${{ github.event_name == 'push' }}
     secrets: inherit
 

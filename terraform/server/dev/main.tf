@@ -21,8 +21,10 @@ module "ecs_app" {
   execution_role_arn  = data.terraform_remote_state.infra.outputs.ecs_execution_role_arn
   execution_role_name = data.terraform_remote_state.infra.outputs.ecs_execution_role_name
 
+  image_uri       = var.image_uri
+  git_commit_hash = var.git_commit_hash
+
   service_name           = var.service_name
-  image_uri              = var.image_uri
   cpu                    = var.cpu
   memory                 = var.memory
   container_port         = var.server_port
