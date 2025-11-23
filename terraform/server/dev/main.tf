@@ -10,7 +10,7 @@ data "terraform_remote_state" "infra" {
 
 module "ecs_app" {
   source  = "../../modules/ecs_app"
-  project = "fun run"
+  project = var.project
 
   vpc_id            = data.terraform_remote_state.infra.outputs.vpc_id
   public_subnets_id = data.terraform_remote_state.infra.outputs.public_subnets
