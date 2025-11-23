@@ -34,10 +34,12 @@ jobs:
 
       - name: Terraform Plan
         working-directory: terraform/server/dev
-        run: terraform plan -out=tfplan \
-              -var="image_uri=${{ inputs.image_uri }}"
+        run: |
+          terraform plan -out=tfplan \
+            -var="image_uri=${{ inputs.image_uri }}"
 
       - name: Terraform Apply
         working-directory: terraform/server/dev
-        run: terraform apply -auto-approve tfplan \
+        run: |
+            terraform apply -auto-approve tfplan \
               -var="image_uri=${{ inputs.image_uri }}"
