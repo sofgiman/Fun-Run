@@ -53,6 +53,12 @@ jobs:
           name: Fun-Run-Server-${{ needs.linux_build.outputs.os }}
           path: ./build/StandaloneLinux64
 
+      - name: Debug folder contents
+        run: ls -l ./build/StandaloneLinux64
+
+      - name: Debug
+        run: ls -l
+
       # runs-on: ubuntu-latest
       # outputs:
       #   IMAGE_NAME_LOWER: ${{ steps.vars.outputs.IMAGE_NAME_LOWER }}
@@ -79,6 +85,7 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ steps.vars.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }} \
             -f docker/Linux/Dockerfile ./build/StandaloneLinux64
+
 
       # Login to GitHub Container Registry
       - name: Log in to GitHub Container Registry
