@@ -29,14 +29,14 @@ jobs:
           terraform_version: 1.14.0
 
       - name: Configure AWS Credentials
-        if: github.event_name != 'push'
+        if: github.event_name == 'pull_request'
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_PLAN }}
           aws-region: us-east-1
 
       - name: Configure AWS Credentials
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request'
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_DEV }}
