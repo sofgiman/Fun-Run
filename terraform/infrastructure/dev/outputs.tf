@@ -22,3 +22,9 @@ output "ecs_execution_role_arn" {
   description = "ECS task arn"
   value       = module.ecs_infra.ecs_execution_role_arn
 }
+
+output "ecs_execution_role_arn" {
+  description = "ECS task arn"
+  value       = module.ecs_infra.ecs_execution_role_name
+}
+
