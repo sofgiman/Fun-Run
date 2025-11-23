@@ -1,0 +1,65 @@
+name: Use terraform apply or plan template
+
+permissions:
+  id-token: write
+
+on:
+  workflow_call:
+    inputs:
+      isApply:
+        required: true
+        type: boolean 
+      stage:  # dev/prod
+        required: true
+        type: string
+      terraformDir: 
+        required: true
+        type: string
+
+jobs:
+  terraform-apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.14.0
+
+      - name: Configure AWS Credentials Plan
+        if: ${{ !inputs.isApply }}
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_PLAN }}
+          aws-region: us-east-1
+      
+      - name: Configure AWS Credentials Dev Apply
+        if: ${{ inputs.isApply && inputs.stage  == 'dev' }}
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_DEV }}
+          aws-region: us-east-1
+
+      - name: Configure AWS Credentials Prod Apply
+        if: ${{ inputs.isApply && inputs.stage  == 'prod' }}
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_DEV }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        working-directory: ${{ inputs.terraformDir }}
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: ${{ inputs.terraformDir }}
+        run: |
+          terraform plan -out=tfplan 
+
+      - name: Terraform Apply
+        if: ${{ inputs.isApply }}
+        working-directory: ${{ inputs.terraformDir }}
+        run: |
+            terraform apply -auto-approve tfplan 
