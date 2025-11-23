@@ -17,8 +17,9 @@ module "ecs_app" {
   vpc_id            = data.terraform_remote_state.infra.outputs.vpc_id
   public_subnets_id = data.terraform_remote_state.infra.outputs.public_subnets
 
-  ecs_cluster_id     = data.terraform_remote_state.infra.outputs.ecs_cluster_id
-  execution_role_arn = data.terraform_remote_state.infra.outputs.ecs_execution_role_arn
+  ecs_cluster_id      = data.terraform_remote_state.infra.outputs.ecs_cluster_id
+  execution_role_arn  = data.terraform_remote_state.infra.outputs.ecs_execution_role_arn
+  execution_role_name = data.terraform_remote_state.infra.outputs.ecs_execution_role_name
 
   service_name           = var.service_name
   image_uri              = var.image_uri
