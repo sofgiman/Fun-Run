@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "this" {
   cpu                      = var.cpu
   memory                   = var.memory
   execution_role_arn       = var.execution_role_arn
-
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -85,6 +85,21 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 
+# task role 
+data "aws_iam_policy_document" "ecs_task_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "ecs_task_role" {
+  name               = "${var.project}-${var.environment}-task-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role.json
+}
 
 
 # If allow to exec into the container
