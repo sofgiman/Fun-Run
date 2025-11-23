@@ -50,14 +50,9 @@ jobs:
         if: ${{ needs.linux_build.outputs.targetPlatform == 'StandaloneLinux64' }}
         uses: actions/download-artifact@v4
         with:
-          name: Fun-Run-Server-${{ needs.linux_build.outputs.os }}
+          name: Fun Run Server ${{ needs.linux_build.outputs.os }}
           path: ./build/StandaloneLinux64
 
-      - name: Debug folder contents
-        run: ls -l ./build/StandaloneLinux64
-
-      - name: Debug
-        run: ls -l
 
       # runs-on: ubuntu-latest
       # outputs:
