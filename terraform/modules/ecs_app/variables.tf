@@ -36,6 +36,11 @@ variable "execution_role_arn" {
   description = "ECS task arn"
 }
 
+variable "execution_role_name" {
+  description = "ECS task name"
+}
+
+
 
 # Server Container Specs
 

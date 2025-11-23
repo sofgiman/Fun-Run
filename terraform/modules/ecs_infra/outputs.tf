@@ -12,3 +12,8 @@ output "ecs_execution_role_arn" {
   description = "ECS task arn"
   value       = aws_iam_role.ecs_task_execution.arn
 }
+
+output "ecs_execution_role_name" {
+  description = "ECS task arn"
+  value       = aws_iam_role.ecs_task_execution.name
+}

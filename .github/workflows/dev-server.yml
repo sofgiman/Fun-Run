@@ -98,7 +98,7 @@ jobs:
           docker push ghcr.io/${{ steps.vars.outputs.IMAGE_NAME_LOWER}}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }}
 
   deploy:
-    needs: [ deploy_infrastructure, dockerize ]
+    needs: [ dockerize, deploy_infrastructure ]
     uses: ./.github/workflows/deploy-ecs-app-template.yml
     with:
       image_uri: ghcr.io/${{ needs.dockerize.outputs.IMAGE_NAME_LOWER }}/fun-run-server:${{ needs.dockerize.outputs.TAG_NAME }}
