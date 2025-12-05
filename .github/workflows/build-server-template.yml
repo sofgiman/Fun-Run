@@ -34,8 +34,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: Library
-          key: Library-Server-${{ inputs.targetPlatform }}
-          restore-keys: Library-Server-${{ inputs.targetPlatform }}
+          key: Library-Server-${{ inputs.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Server-${{ inputs.targetPlatform }}-
 
       - name: Build Unity Project
         uses: game-ci/unity-builder@v4
