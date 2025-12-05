@@ -33,6 +33,10 @@ jobs:
       isApply: ${{ github.event_name == 'push' }}
       stage: "dev"
       terraformDir: "terraform/infrastructure/dev"
+      backendBucket: "fun-run-terraform-state"
+      backendKey: "infrastructure/dev/terraform.tfstate"
+      backendRegion: "us-east-1"
+      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
     secrets: inherit
 
   dockerize:
@@ -107,6 +111,7 @@ jobs:
       image_uri: ghcr.io/${{ needs.dockerize.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize.outputs.COMMIT_HASH }}
       isApply: ${{ github.event_name == 'push' }}
+      terraformDir: terraform/server/dev
     secrets: inherit
 
 

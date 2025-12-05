@@ -14,6 +14,10 @@ on:
       isApply: 
         required: true
         type: boolean
+      terraformDir:
+        required: true
+        type: string
+
       
 
 jobs:
@@ -43,11 +47,11 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform Init
-        working-directory: terraform/server/dev
+        working-directory: ${{ inputs.terraformDir }}
         run: terraform init
 
       - name: Terraform Plan
-        working-directory: terraform/server/dev
+        working-directory: ${{ inputs.terraformDir }}
         run: |
           terraform plan -out=tfplan \
             -var="image_uri=${{ inputs.image_uri }}" \
@@ -55,6 +59,8 @@ jobs:
 
       - name: Terraform Apply
         if:  ${{ inputs.isApply }}
-        working-directory: terraform/server/dev
+        working-directory: ${{ inputs.terraformDir }}
         run: |
             terraform apply -auto-approve tfplan 
+
+            

@@ -9,11 +9,10 @@ RUN apt-get update && apt-get install -y libsqlite3-0 && rm -rf /var/lib/apt/lis
 WORKDIR /server
 COPY . .
 
-# Make the binary executable (sometimes lost in artifact)
-RUN chmod +x "Fun Run Server"
+RUN chmod +x "fun-run-server"
 
-# Expose the port your
-EXPOSE 7777
+# Expose the 7777 mirror port using udp protocol
+EXPOSE 7777/udp
 
 # Set the default entrypoint
-ENTRYPOINT ["./Fun Run Server", "-batchmode", "-nographics", "-logfile", "/dev/stdout"]
+ENTRYPOINT ["./fun-run-server", "-batchmode", "-nographics", "-logfile", "/dev/stdout"]
