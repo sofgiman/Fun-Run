@@ -14,10 +14,26 @@ on:
       isApply: 
         required: true
         type: boolean
+      stage: # dev / prod
+        required: true
+        type: string
+      # terraform state config
       terraformDir:
         required: true
         type: string
-
+      backendBucket:
+        required: true
+        type: string
+      backendKey:
+        required: true
+        type: string
+      backendRegion:
+        required: false
+        type: string
+        default: "us-east-1"
+      backendDynamoTable:
+        required: true
+        type: string
       
 
 jobs:
@@ -47,13 +63,18 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform Init
-        working-directory: ${{ inputs.terraformDir }}
-        run: terraform init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ inputs.backendBucket }}" \
+            -backend-config="key=${{ inputs.backendKey }}" \
+            -backend-config="region=us-east-1" \
+            -backend-config="dynamodb_table=${{ inputs.backendDynamoTable }}"
 
       - name: Terraform Plan
         working-directory: ${{ inputs.terraformDir }}
         run: |
           terraform plan -out=tfplan \
+            -var-file="${{ inputs.stage }}.tfvars" \
             -var="image_uri=${{ inputs.image_uri }}" \
             -var="git_commit_hash=${{ inputs.git_commit_hash }}"
 

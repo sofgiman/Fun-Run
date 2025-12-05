@@ -1,9 +1,9 @@
 data "terraform_remote_state" "infra" {
   backend = "s3"
   config = {
-    bucket = "fun-run-terraform-state"
-    key    = "dev/terraform.tfstate"
-    region = "us-east-1"
+    bucket = var.tf_state_bucket
+    key    = "infrastructure/${var.environment}/terraform.tfstate"
+    region = var.region
   }
 }
 

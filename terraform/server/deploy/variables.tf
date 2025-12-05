@@ -16,6 +16,12 @@ variable "region" {
   default     = "us-east-1"
 }
 
+variable "tf_state_bucket" {
+  description = "The S3 bucket name where the infrastructure state is stored"
+  type        = string
+  default     = "fun-run-terraform-state"
+}
+
 # Server Container Specs
 
 # Name of the ECS service
