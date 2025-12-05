@@ -32,7 +32,7 @@ jobs:
     with:
       isApply: ${{ github.event_name == 'push' }}
       stage: "dev"
-      terraformDir: "terraform/infrastructure/dev"
+      terraformDir: "terraform/infrastructure/deploy/dev"
       backendBucket: "fun-run-terraform-state"
       backendKey: "infrastructure/dev/terraform.tfstate"
       backendRegion: "us-east-1"
