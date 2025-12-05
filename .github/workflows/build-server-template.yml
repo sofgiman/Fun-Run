@@ -46,7 +46,7 @@ jobs:
         with:
           projectPath: .
           targetPlatform: ${{ inputs.targetPlatform }}
-          buildName: Fun Run Server
+          buildName: fun-run-server
           customParameters: -standaloneBuildSubtarget Server
 
       - name: Upload Artifacts

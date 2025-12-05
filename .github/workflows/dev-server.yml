@@ -107,6 +107,7 @@ jobs:
       image_uri: ghcr.io/${{ needs.dockerize.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize.outputs.COMMIT_HASH }}
       isApply: ${{ github.event_name == 'push' }}
+      terraform_dir: terraform/server/dev
     secrets: inherit
 
 
