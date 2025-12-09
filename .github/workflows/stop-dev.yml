@@ -1,0 +1,22 @@
+name: Stop Dev Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scale_down:
+    uses: ./.github/workflows/deploy-ecs-app-template.yml
+    with:
+      image_uri: "ignore" 
+      git_commit_hash: "ignore"
+      
+      isApply: true
+      stage: "dev"
+      terraformDir: "terraform/server/deploy"
+      backendBucket: "fun-run-terraform-state"
+      backendKey: "server/dev/terraform.tfstate"
+      backendRegion: "us-east-1"
+      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
+      
+      desired_count: "0"
+    secrets: inherit
