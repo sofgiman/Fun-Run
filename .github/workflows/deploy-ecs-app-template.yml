@@ -86,7 +86,7 @@ jobs:
           terraform plan -out=tfplan \
             -var-file="${{ inputs.stage }}.tfvars" \
             -var="image_uri=${{ inputs.image_uri }}" \
-            -var="git_commit_hash=${{ inputs.git_commit_hash }}" \ 
+            -var="git_commit_hash=${{ inputs.git_commit_hash }}" \
             ${EXTRA_ARGS}
 
       - name: Terraform Apply
