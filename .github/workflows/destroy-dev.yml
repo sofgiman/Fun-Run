@@ -41,6 +41,7 @@ jobs:
 
   destroy_server:
     name: Destroy ECS Server
+    needs: safety_checks
     uses: ./.github/workflows/deploy-ecs-app-template.yml
     with:
       
