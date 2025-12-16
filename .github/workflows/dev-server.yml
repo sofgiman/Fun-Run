@@ -31,6 +31,7 @@ jobs:
     uses: ./.github/workflows/template-terraform.yml
     with:
       isApply: ${{ github.event_name == 'push' }}
+      isDestroy: false
       stage: "dev"
       terraformDir: "terraform/infrastructure/deploy"
       backendBucket: "fun-run-terraform-state"
@@ -111,6 +112,7 @@ jobs:
       image_uri: ghcr.io/${{ needs.dockerize.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize.outputs.COMMIT_HASH }}
       isApply: ${{ github.event_name == 'push' }}
+      isDestroy: false
       stage: "dev"
       terraformDir: terraform/server/deploy
       # terraform state config
