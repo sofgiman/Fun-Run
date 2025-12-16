@@ -92,7 +92,7 @@ jobs:
             EXTRA_ARGS="-var=desired_count=${{ inputs.desired_count }}"
           fi
         
-          terraform plan -out=tfplan \
+          terraform plan ${MODE_FLAG} -out=tfplan \
             -var-file="${{ inputs.stage }}.tfvars" \
             -var="image_uri=${{ inputs.image_uri }}" \
             -var="git_commit_hash=${{ inputs.git_commit_hash }}" \

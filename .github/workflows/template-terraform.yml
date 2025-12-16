@@ -84,7 +84,7 @@ jobs:
             MODE_FLAG="-destroy"
           fi
 
-          terraform plan -out=tfplan \
+          terraform plan ${MODE_FLAG} -out=tfplan \
             -var-file="${{ inputs.stage }}.tfvars"
 
       - name: Terraform Apply
