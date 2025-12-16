@@ -1,0 +1,73 @@
+name: Destroy Dev Environment 
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_action:
+        description: 'Are you SURE you want to destroy the DEV environment?'
+        required: true
+        type: boolean
+        default: false
+      verification_code:
+        description: 'Type "DESTROY" to confirm'
+        required: true
+        type: string
+
+jobs:
+  safety_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Branch
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/dev" ]]; then
+            echo "ERROR: This workflow can only be run from the 'dev' branch."
+            echo "Current branch: ${{ github.ref }}"
+            exit 1
+          fi
+          echo "Branch verification passed."
+
+      - name: Verify Confirmation
+        run: |
+          if [[ "${{ inputs.confirm_action }}" != "true" ]]; then
+            echo "ERROR: You must check the confirmation box."
+            exit 1
+          fi
+          
+          if [[ "${{ inputs.verification_code }}" != "DESTROY" ]]; then
+             echo "ERROR: You must type 'DESTROY' in the verification field."
+             exit 1
+          fi
+          echo "User confirmation passed."
+
+  destroy_server:
+    name: Destroy ECS Server
+    needs: safety_checks
+    uses: ./.github/workflows/deploy-ecs-app-template.yml
+    with:
+      
+      image_uri: "ignore"
+      git_commit_hash: "ignore"
+      
+      isApply: true
+      isDestroy: true  
+      stage: "dev"
+      terraformDir: "terraform/server/deploy"
+      
+      backendBucket: "fun-run-terraform-state"
+      backendKey: "server/dev/terraform.tfstate"
+      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
+    secrets: inherit
+
+  destroy_infra:
+    name: Destroy Infrastructure
+    needs: destroy_server 
+    uses: ./.github/workflows/template-terraform.yml 
+    with:
+      isApply: true
+      isDestroy: true
+      stage: "dev"
+      terraformDir: "terraform/infrastructure/deploy"
+      backendBucket: "fun-run-terraform-state"
+      backendKey: "infrastructure/dev/terraform.tfstate"
+      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
+    secrets: inherit

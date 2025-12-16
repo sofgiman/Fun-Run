@@ -9,6 +9,10 @@ on:
       isApply:
         required: true
         type: boolean 
+      isDestroy: 
+        required: false
+        type: boolean
+        default: false
       stage:  # dev/prod
         required: true
         type: string
@@ -75,6 +79,11 @@ jobs:
       - name: Terraform Plan
         working-directory: ${{ inputs.terraformDir }}
         run: |
+          MODE_FLAG=""
+          if [ "${{ inputs.isDestroy }}" == "true" ]; then
+            MODE_FLAG="-destroy"
+          fi
+
           terraform plan -out=tfplan \
             -var-file="${{ inputs.stage }}.tfvars"
 
