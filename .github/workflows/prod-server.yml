@@ -34,9 +34,9 @@ jobs:
       backendKey: "infrastructure/prod/terraform.tfstate"
       backendRegion: "us-east-1"
       backendDynamoTable: "dynamoDB_to_lock_terraform_state"
+    secrets: 
       role_arn: ${{ secrets.AWS_ROLE_PROD }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
-    secrets: inherit
 
   dockerize_and_push:
     needs: linux_build
@@ -59,6 +59,7 @@ jobs:
       backendKey: "server/prod/terraform.tfstate"
       backendRegion: "us-east-1"
       backendDynamoTable: "dynamoDB_to_lock_terraform_state"
+    secrets: 
       role_arn: ${{ secrets.AWS_ROLE_PROD }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
-    secrets: inherit
+
