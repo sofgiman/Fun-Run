@@ -1,0 +1,61 @@
+name: Dev Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  linux_build: 
+    uses: ./.github/workflows/build-server-template.yml
+    with:
+      os: "ubuntu"
+      targetPlatform: "StandaloneLinux64"
+    secrets: inherit
+  
+  windows_build:
+    uses: ./.github/workflows/build-server-template.yml
+    with:
+      os: "windows"
+      targetPlatform: "StandaloneWindows64"
+    secrets: inherit
+
+  deploy_infrastructure:
+    uses: ./.github/workflows/template-terraform.yml
+    with:
+      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      isDestroy: false
+      stage: "dev"
+      terraformDir: "terraform/infrastructure/deploy"
+      backendBucket: "fun-run-terraform-state"
+      backendKey: "infrastructure/dev/terraform.tfstate"
+      backendRegion: "us-east-1"
+      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
+    secrets: inherit
+
+  dockerize_and_push:
+    needs: linux_build
+    uses: ./.github/workflows/template-dockerize-and-push.yml
+    with:
+      artifact_name: ${{ needs.linux_build.outputs.artifact_name }}
+    secrets: inherit
+
+  deploy:
+    needs: [ dockerize_and_push, deploy_infrastructure ]
+    uses: ./.github/workflows/deploy-ecs-app-template.yml
+    with:
+      image_uri: ghcr.io/${{ needs.dockerize_and_push.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize_and_push.outputs.TAG_NAME }}
+      git_commit_hash: ${{ needs.dockerize_and_push.outputs.COMMIT_HASH }}
+      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      isDestroy: false
+      stage: "dev"
+      terraformDir: terraform/server/deploy
+      backendBucket: "fun-run-terraform-state"
+      backendKey: "server/dev/terraform.tfstate"
+      backendRegion: "us-east-1"
+      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
+    secrets: inherit
