@@ -1,10 +1,13 @@
-name: Prod Deploy
+name: Dev Server
 
 on:
   workflow_dispatch:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
 
 jobs:
   linux_build: 
@@ -24,15 +27,17 @@ jobs:
   deploy_infrastructure:
     uses: ./.github/workflows/template-terraform.yml
     with:
-      isApply: true
+      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
       isDestroy: false
-      stage: "prod"
+      stage: "dev"
       terraformDir: "terraform/infrastructure/deploy"
       backendBucket: "fun-run-terraform-state"
-      backendKey: "infrastructure/prod/terraform.tfstate"
+      backendKey: "infrastructure/dev/terraform.tfstate"
       backendRegion: "us-east-1"
       backendDynamoTable: "dynamoDB_to_lock_terraform_state"
-    secrets: inherit
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
 
   dockerize_and_push:
     needs: linux_build
@@ -47,12 +52,14 @@ jobs:
     with:
       image_uri: ghcr.io/${{ needs.dockerize_and_push.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize_and_push.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize_and_push.outputs.COMMIT_HASH }}
-      isApply: true
+      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
       isDestroy: false
-      stage: "prod"
+      stage: "dev"
       terraformDir: terraform/server/deploy
       backendBucket: "fun-run-terraform-state"
-      backendKey: "server/prod/terraform.tfstate"
+      backendKey: "server/dev/terraform.tfstate"
       backendRegion: "us-east-1"
       backendDynamoTable: "dynamoDB_to_lock_terraform_state"
-    secrets: inherit
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}

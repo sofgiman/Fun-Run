@@ -32,7 +32,11 @@ on:
       backendDynamoTable:
         required: true
         type: string
-        default: "dynamoDB_to_lock_terraform_state"
+    secrets:
+      role_arn:
+        required: true
+      role_plan_arn:
+        required: true
 
 jobs:
   terraform-apply:
@@ -46,25 +50,10 @@ jobs:
         with:
           terraform_version: 1.14.0
 
-      - name: Configure AWS Credentials Plan
-        if: ${{ !inputs.isApply }}
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_PLAN }}
-          aws-region: us-east-1
-      
-      - name: Configure AWS Credentials Dev Apply
-        if: ${{ inputs.isApply && inputs.stage  == 'dev' }}
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_DEV }}
-          aws-region: us-east-1
-
-      - name: Configure AWS Credentials Prod Apply
-        if: ${{ inputs.isApply && inputs.stage  == 'prod' }}
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_PROD }}
+          role-to-assume: ${{ inputs.isApply && secrets.role_arn || secrets.role_plan_arn }}
           aws-region: us-east-1
 
       - name: Terraform Init

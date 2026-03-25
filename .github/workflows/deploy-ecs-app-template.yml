@@ -42,7 +42,12 @@ on:
         required: false
         type: string
         default: "" 
-      
+    secrets:
+      role_arn:
+        required: true
+      role_plan_arn:
+        required: true
+
 
 jobs:
   terraform-apply:
@@ -56,18 +61,10 @@ jobs:
         with:
           terraform_version: 1.14.0
 
-      - name: Configure AWS Credentials Plan
-        if: ${{ !inputs.isApply }}
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_PLAN }}
-          aws-region: us-east-1
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
-        if: ${{ inputs.isApply }}
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_DEV }}
+          role-to-assume: ${{ inputs.isApply && secrets.role_arn || secrets.role_plan_arn }}
           aws-region: us-east-1
 
       - name: Terraform Init
