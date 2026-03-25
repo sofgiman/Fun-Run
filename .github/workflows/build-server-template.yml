@@ -10,10 +10,8 @@ on:
         required: true
         type: string
     outputs:
-      os: 
-        value: ${{ jobs.build.outputs.os }}
-      targetPlatform:
-        value: ${{ jobs.build.outputs.targetPlatform }}
+      artifact_name: 
+        value: ${{ jobs.build.outputs.artifact_name }}
 
 
 jobs:
@@ -21,8 +19,7 @@ jobs:
     name: Build for ${{ inputs.targetPlatform }}
     runs-on: ubuntu-latest
     outputs:
-      targetPlatform: ${{ inputs.targetPlatform }}
-      os: ${{ inputs.os }}
+      artifact_name: Fun-Run-Server-${{ inputs.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,8 +31,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: Library
-          key: Library-Server-${{ inputs.targetPlatform }}
-          restore-keys: Library-Server-${{ inputs.targetPlatform }}
+          key: Library-Server-${{ inputs.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Server-${{ inputs.targetPlatform }}-
 
       - name: Build Unity Project
         uses: game-ci/unity-builder@v4
@@ -46,11 +44,11 @@ jobs:
         with:
           projectPath: .
           targetPlatform: ${{ inputs.targetPlatform }}
-          buildName: Fun Run Server
+          buildName: fun-run-server
           customParameters: -standaloneBuildSubtarget Server
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Fun Run Server ${{ inputs.os }}
+          name: Fun-Run-Server-${{ inputs.os }}
           path: build/${{ inputs.targetPlatform }}

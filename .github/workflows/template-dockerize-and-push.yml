@@ -1,0 +1,60 @@
+name: Template Dockerize and Push Docker
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        required: true
+        type: string
+        description: "Name of the downloaded artifact"
+    outputs:
+      REPOSITORY_LOWER_CASE:
+        description: "Lowercase repo name"
+        value: ${{ jobs.dockerize_and_push.outputs.REPOSITORY_LOWER_CASE }}
+      TAG_NAME:
+        description: "Docker tag"
+        value: ${{ jobs.dockerize_and_push.outputs.TAG_NAME }}
+      COMMIT_HASH:
+        description: "Git commit hash"
+        value: ${{ jobs.dockerize_and_push.outputs.COMMIT_HASH }}
+
+jobs:
+  dockerize_and_push:
+    runs-on: ubuntu-latest
+    outputs:
+      REPOSITORY_LOWER_CASE: ${{ steps.vars.outputs.REPOSITORY_LOWER_CASE }}
+      TAG_NAME: ${{ steps.vars.outputs.TAG_NAME }}
+      COMMIT_HASH: ${{ steps.vars.outputs.COMMIT_HASH }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: ./downloaded-artifact
+          
+      - name: Compute variables
+        id: vars
+        run: |
+          REPOSITORY_LOWER_CASE=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          echo "REPOSITORY_LOWER_CASE=${REPOSITORY_LOWER_CASE}" >> $GITHUB_OUTPUT
+          TAG=$(basename "$GITHUB_REF_NAME")
+          echo "TAG_NAME=${TAG}" >> $GITHUB_OUTPUT
+          echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          
+      - name: Build Docker Image
+        run: |
+          docker build -t ghcr.io/${{ steps.vars.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }} \
+            -f docker/Linux/Dockerfile ./downloaded-artifact
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Docker Image
+        run: |
+          docker push ghcr.io/${{ steps.vars.outputs.REPOSITORY_LOWER_CASE}}/fun-run-server:${{ steps.vars.outputs.TAG_NAME }}

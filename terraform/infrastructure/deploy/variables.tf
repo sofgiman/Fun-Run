@@ -1,12 +1,12 @@
 variable "project" {
   description = "fun-run"
   type        = string
+  default     = "fun-run"
 }
 
 variable "environment" {
   description = "Environment name (dev, prod)"
   type        = string
-  default     = "dev"
 }
 
 variable "region" {
@@ -16,9 +16,8 @@ variable "region" {
 }
 
 variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
-  type        = string
-  default     = "10.0.0.0/16"
+  type    = string
+  default = "10.0.0.0/16"
 }
 
 variable "public_subnet_cidrs" {
@@ -27,3 +26,7 @@ variable "public_subnet_cidrs" {
   default     = ["10.0.0.0/24", "10.0.1.0/24"]
 }
 
+variable "enable_execute_command" {
+  type    = bool
+  default = false
+}
