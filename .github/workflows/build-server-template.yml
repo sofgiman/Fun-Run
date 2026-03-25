@@ -12,6 +12,10 @@ on:
     outputs:
       artifact_name: 
         value: ${{ jobs.build.outputs.artifact_name }}
+      os: 
+        value: ${{ jobs.build.outputs.os }}
+      targetPlatform:
+        value: ${{ jobs.build.outputs.targetPlatform }}
 
 
 jobs:
@@ -20,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       artifact_name: Fun-Run-Server-${{ inputs.os }}
+      targetPlatform: ${{ inputs.targetPlatform }}
+      os: ${{ inputs.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
