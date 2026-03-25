@@ -67,6 +67,10 @@ jobs:
           role-to-assume: ${{ inputs.isApply && secrets.role_arn || secrets.role_plan_arn }}
           aws-region: us-east-1
 
+      - name: Verify AWS Identity
+        run: |
+          echo "Connected as: $(aws sts get-caller-identity --query 'Arn' --output text | cut -d'/' -f2)"
+
       - name: Terraform Init
         working-directory: ${{ inputs.terraformDir }}
         run: |
