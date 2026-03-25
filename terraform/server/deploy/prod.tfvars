@@ -1,6 +1,6 @@
-# dev.tfvars
+# prod.tfvars
 project     = "fun-run"
-environment = "dev"       
+environment = "prod"       
 region      = "us-east-1"
 tf_state_bucket = "fun-run-terraform-state"
 

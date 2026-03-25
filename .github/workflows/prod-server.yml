@@ -5,18 +5,40 @@ on:
   push:
     tags:
       - 'v*.*.*'
-    branches: 
+  pull_request:
+    branches:
       - main
 
 jobs:
-  linux_build: 
+  verify_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure tag is from main
+        if: github.event_name != 'pull_request' 
+        run: |
+          TAG_COMMIT=$(git rev-list -n 1 "${{ github.ref_name }}")
+          if git merge-base --is-ancestor "$TAG_COMMIT" origin/main; then
+            echo "Tag ${{ github.ref_name }} is from main. Proceeding."
+          else
+            echo "ERROR: Tag ${{ github.ref_name }} was not created from main!"
+            exit 1
+          fi
+
+  linux_build:
+    needs: verify_branch
     uses: ./.github/workflows/build-server-template.yml
     with:
       os: "ubuntu"
       targetPlatform: "StandaloneLinux64"
     secrets: inherit
-  
+
   windows_build:
+    needs: verify_branch
     uses: ./.github/workflows/build-server-template.yml
     with:
       os: "windows"
@@ -24,9 +46,10 @@ jobs:
     secrets: inherit
 
   deploy_infrastructure:
+    needs: verify_branch
     uses: ./.github/workflows/template-terraform.yml
     with:
-      isApply: true
+      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
       isDestroy: false
       stage: "prod"
       terraformDir: "terraform/infrastructure/deploy"
@@ -51,7 +74,7 @@ jobs:
     with:
       image_uri: ghcr.io/${{ needs.dockerize_and_push.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize_and_push.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize_and_push.outputs.COMMIT_HASH }}
-      isApply: true
+      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
       isDestroy: false
       stage: "prod"
       terraformDir: terraform/server/deploy
@@ -62,4 +85,3 @@ jobs:
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_PROD }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
-
