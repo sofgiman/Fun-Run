@@ -138,6 +138,6 @@ data "aws_iam_policy_document" "ecs_exec" {
 resource "aws_iam_role_policy" "ecs_exec_policy" {
   count  = var.enable_execute_command ? 1 : 0
   name   = "${var.project}-${var.environment}-ecs-exec-policy"
-  role   = var.execution_role_name
+  role   = aws_iam_role.ecs_task_role.name
   policy = data.aws_iam_policy_document.ecs_exec[0].json
 }
