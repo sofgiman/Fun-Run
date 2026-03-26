@@ -35,8 +35,11 @@ jobs:
     with:
       image_uri: "ignore" 
       git_commit_hash: "ignore"
+      
       # If dry_run is true, isApply becomes false (uses plan role instead of dev role)
       isApply: ${{ !inputs.dry_run }}
+      isDestroy: false
+
       stage: "dev"
       terraformDir: "terraform/server/deploy"
       desired_count: "0"
