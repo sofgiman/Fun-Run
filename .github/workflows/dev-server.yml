@@ -27,7 +27,7 @@ jobs:
   deploy_infrastructure:
     uses: ./.github/workflows/template-terraform.yml
     with:
-      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      isApply: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'dev' }}
       isDestroy: false
       stage: "dev"
       terraformDir: "terraform/infrastructure/deploy"
