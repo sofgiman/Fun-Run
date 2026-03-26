@@ -46,11 +46,16 @@ jobs:
     with:
       image_uri: "ignore" 
       git_commit_hash: "ignore"
+<<<<<<< HEAD
 
       # If dry_run is true, isApply becomes false (uses plan role instead of prod role)
       isApply: ${{ !inputs.dry_run }}
       isDestroy: false
 
+=======
+      # If dry_run is true, isApply becomes false (uses plan role instead of prod role)
+      isApply: ${{ !inputs.dry_run }}
+>>>>>>> 0cbfebc (Added destroy and stop pipelines for prod and dev)
       stage: "prod"
       terraformDir: "terraform/server/deploy"
       desired_count: "0"

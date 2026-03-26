@@ -31,6 +31,7 @@ jobs:
 
   scale_down:
 <<<<<<< HEAD
+<<<<<<< HEAD
     needs: safety_checks
     uses: ./.github/workflows/template-deploy-server.yml
 =======
@@ -44,6 +45,15 @@ jobs:
       isApply: ${{ !inputs.dry_run }}
       isDestroy: false
 
+=======
+    needs: safety_checks
+    uses: ./.github/workflows/template-deploy-server.yml
+    with:
+      image_uri: "ignore" 
+      git_commit_hash: "ignore"
+      # If dry_run is true, isApply becomes false (uses plan role instead of dev role)
+      isApply: ${{ !inputs.dry_run }}
+>>>>>>> 0cbfebc (Added destroy and stop pipelines for prod and dev)
       stage: "dev"
       terraformDir: "terraform/server/deploy"
       desired_count: "0"

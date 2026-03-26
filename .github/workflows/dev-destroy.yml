@@ -58,10 +58,14 @@ jobs:
     name: Destroy ECS Server
     needs: safety_checks
 <<<<<<< HEAD
+<<<<<<< HEAD
     uses: ./.github/workflows/template-deploy-server.yml
 =======
     uses: ./.github/workflows/template-deploy-ecs-app.yml
 >>>>>>> 20f9f03 (refactor: use hcl partial configs for terraform backend)
+=======
+    uses: ./.github/workflows/template-deploy-server.yml
+>>>>>>> 0cbfebc (Added destroy and stop pipelines for prod and dev)
     with:
       image_uri: "ignore"
       git_commit_hash: "ignore"
