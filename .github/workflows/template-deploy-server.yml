@@ -1,4 +1,4 @@
-name: Deploy ECS App Template
+name: "[Template] Terraform Deploy ECS App"
 
 permissions:
   id-token: write

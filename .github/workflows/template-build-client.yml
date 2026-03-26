@@ -1,4 +1,4 @@
-name: Unity Client Build Template
+name: "[Template] Unity Client Build"
 
 on:
   workflow_call:

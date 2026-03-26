@@ -1,4 +1,4 @@
-name: Template Dockerize and Push Docker
+name: "[Template] Dockerize and Push Docker"
 
 on:
   workflow_call:

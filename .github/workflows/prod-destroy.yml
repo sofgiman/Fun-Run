@@ -4,7 +4,7 @@
 # Runs strictly from the 'main' branch for AWS OIDC compliance.
 # Actual destruction is restricted to 'sofgiman'; 'Dry Run' is available for all.
 
-name: Destroy Prod Environment 
+name: "[Prod] Destroy Environment"
 
 on:
   workflow_dispatch:
