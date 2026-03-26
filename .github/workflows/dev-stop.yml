@@ -17,6 +17,7 @@ jobs:
       backendKey: "server/dev/terraform.tfstate"
       backendRegion: "us-east-1"
       backendDynamoTable: "dynamoDB_to_lock_terraform_state"
-      
       desired_count: "0"
-    secrets: inherit
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
