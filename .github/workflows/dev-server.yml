@@ -31,10 +31,6 @@ jobs:
       isDestroy: false
       stage: "dev"
       terraformDir: "terraform/infrastructure/deploy"
-      backendBucket: "fun-run-terraform-state"
-      backendKey: "infrastructure/dev/terraform.tfstate"
-      backendRegion: "us-east-1"
-      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_DEV }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}

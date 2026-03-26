@@ -63,11 +63,8 @@ jobs:
       - name: Terraform Init
         working-directory: ${{ inputs.terraformDir }}
         run: |
-          terraform init \
-            -backend-config="bucket=${{ inputs.backendBucket }}" \
-            -backend-config="key=${{ inputs.backendKey }}" \
-            -backend-config="region=${{ inputs.backendRegion }}" \
-            -backend-config="dynamodb_table=${{ inputs.backendDynamoTable }}"
+          echo "Initializing Terraform using backend config file: backend-${{ inputs.stage }}.hcl"
+          terraform init -backend-config="backend-${{ inputs.stage }}.hcl" -reconfigure
 
       - name: Terraform Plan
         working-directory: ${{ inputs.terraformDir }}
