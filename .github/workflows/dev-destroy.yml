@@ -1,0 +1,82 @@
+# Dev Environment Destroy
+#
+# Destroys the Dev ECS server and underlying infrastructure.
+# Runs strictly from the 'dev' branch for AWS OIDC compliance.
+# Includes a safe 'Dry Run' mode to preview the Terraform plan.
+
+name: "[Dev] Destroy Environment"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry Run (Terraform Plan only - Safe)'
+        required: true
+        type: boolean
+        default: true
+      confirm_action:
+        description: 'Are you SURE you want to destroy the DEV environment? (Ignored if Dry Run)'
+        required: false
+        type: boolean
+        default: false
+      verification_code:
+        description: 'Type "DESTROY" to confirm (Ignored if Dry Run)'
+        required: false
+        type: string
+
+jobs:
+  safety_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Branch
+        run: |
+          # Ensure the workflow is only triggered from the dev branch
+          if [[ "${{ github.ref }}" != "refs/heads/dev" ]]; then
+            echo "ERROR: This workflow can only be run from the 'dev' branch."
+            echo "Current branch: ${{ github.ref }}"
+            exit 1
+          fi
+          echo "Branch verification passed."
+
+      - name: Verify Confirmation (Only for Apply)
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          if [[ "${{ inputs.confirm_action }}" != "true" ]]; then
+            echo "ERROR: You must check the confirmation box to apply destroy."
+            exit 1
+          fi
+          
+          if [[ "${{ inputs.verification_code }}" != "DESTROY" ]]; then
+             echo "ERROR: You must type 'DESTROY' in the verification field."
+             exit 1
+          fi
+          echo "User confirmation for actual destruction passed."
+
+  destroy_server:
+    name: Destroy ECS Server
+    needs: safety_checks
+    uses: ./.github/workflows/template-deploy-server.yml
+    with:
+      image_uri: "ignore"
+      git_commit_hash: "ignore"
+      # If dry_run is true, isApply becomes false (uses plan role)
+      isApply: ${{ !inputs.dry_run }} 
+      isDestroy: true  
+      stage: "dev"
+      terraformDir: "terraform/server/deploy"
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
+
+  destroy_infra:
+    name: Destroy Infrastructure
+    needs: destroy_server 
+    uses: ./.github/workflows/template-deploy-infrastructure.yml 
+    with:
+      isApply: ${{ !inputs.dry_run }} 
+      isDestroy: true
+      stage: "dev"
+      terraformDir: "terraform/infrastructure/deploy"
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}

@@ -1,0 +1,56 @@
+# Prod Server Stop
+#
+# Gracefully stops the Prod application by scaling the ECS service to 0.
+# Leaves the underlying infrastructure (VPC, Cluster, etc.) intact.
+# Runs strictly from the 'main' branch. Actual apply is restricted to 'sofgiman'.
+
+name: "[Prod] Stop Server"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry Run (Terraform Plan only)'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  safety_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Branch
+        run: |
+          # Ensure the workflow is only triggered from the main branch for PROD
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "ERROR: This workflow can only be run from the 'main' branch."
+            echo "Current branch: ${{ github.ref }}"
+            exit 1
+          fi
+          echo "Branch verification passed."
+
+      - name: Verify Authorized User (Only for Apply)
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          # Ensure only 'sofgiman' can actually stop the Prod server
+          if [[ "${{ github.actor }}" != "sofgiman" ]]; then
+            echo "ERROR: Unauthorized action. Only 'sofgiman' is allowed to apply this change to PROD."
+            echo "Attempted by: ${{ github.actor }}"
+            exit 1
+          fi
+          echo "User authorization passed. Proceeding with Prod teardown."
+
+  scale_down:
+    needs: safety_checks
+    uses: ./.github/workflows/template-deploy-server.yml
+    with:
+      image_uri: "ignore" 
+      git_commit_hash: "ignore"
+      isApply: ${{ !inputs.dry_run }}
+      isDestroy: false
+      stage: "prod"
+      terraformDir: "terraform/server/deploy"
+      desired_count: "0"
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_PROD }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}

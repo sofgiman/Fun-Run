@@ -1,4 +1,4 @@
-name: Deploy ECS App Template
+name: "[Template] Terraform Deploy ECS App"
 
 permissions:
   id-token: write
@@ -21,21 +21,7 @@ on:
       stage: # dev / prod
         required: true
         type: string
-      # terraform state config
       terraformDir:
-        required: true
-        type: string
-      backendBucket:
-        required: true
-        type: string
-      backendKey:
-        required: true
-        type: string
-      backendRegion:
-        required: false
-        type: string
-        default: "us-east-1"
-      backendDynamoTable:
         required: true
         type: string
       desired_count:
@@ -74,11 +60,8 @@ jobs:
       - name: Terraform Init
         working-directory: ${{ inputs.terraformDir }}
         run: |
-          terraform init \
-            -backend-config="bucket=${{ inputs.backendBucket }}" \
-            -backend-config="key=${{ inputs.backendKey }}" \
-            -backend-config="region=us-east-1" \
-            -backend-config="dynamodb_table=${{ inputs.backendDynamoTable }}"
+          echo "Initializing Terraform using backend config file: backend-${{ inputs.stage }}.hcl"
+          terraform init -backend-config="backend-${{ inputs.stage }}.hcl" -reconfigure
 
       - name: Terraform Plan
         working-directory: ${{ inputs.terraformDir }}
