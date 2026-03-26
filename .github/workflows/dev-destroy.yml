@@ -56,7 +56,9 @@ jobs:
       backendBucket: "fun-run-terraform-state"
       backendKey: "server/dev/terraform.tfstate"
       backendDynamoTable: "dynamoDB_to_lock_terraform_state"
-    secrets: inherit
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
 
   destroy_infra:
     name: Destroy Infrastructure
@@ -70,4 +72,6 @@ jobs:
       backendBucket: "fun-run-terraform-state"
       backendKey: "infrastructure/dev/terraform.tfstate"
       backendDynamoTable: "dynamoDB_to_lock_terraform_state"
-    secrets: inherit
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
