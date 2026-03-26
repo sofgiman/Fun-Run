@@ -1,4 +1,4 @@
-name: Use terraform apply or plan template
+name: "[Template] Terraform Deploy Infrastructure"
 
 permissions:
   id-token: write
