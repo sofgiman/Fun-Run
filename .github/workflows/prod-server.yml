@@ -1,4 +1,4 @@
-name:  Prod Server
+name: "[Prod] Deploy Server"
 
 on:
   workflow_dispatch:
@@ -66,15 +66,7 @@ jobs:
 
   deploy:
     needs: [ dockerize_and_push, deploy_infrastructure ]
-<<<<<<< HEAD
-<<<<<<< HEAD
     uses: ./.github/workflows/template-deploy-server.yml
-=======
-    uses: ./.github/workflows/template-deploy-ecs-app.yml
->>>>>>> 20f9f03 (refactor: use hcl partial configs for terraform backend)
-=======
-    uses: ./.github/workflows/template-deploy-server.yml
->>>>>>> 0cbfebc (Added destroy and stop pipelines for prod and dev)
     with:
       image_uri: ghcr.io/${{ needs.dockerize_and_push.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize_and_push.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize_and_push.outputs.COMMIT_HASH }}

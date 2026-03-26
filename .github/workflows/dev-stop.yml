@@ -4,7 +4,7 @@
 # Leaves the underlying infrastructure (VPC, Cluster, etc.) intact.
 # Runs strictly from the 'dev' branch and includes a safe 'Dry Run' mode.
 
-name: Stop Dev Server
+name: "[Dev] Stop Server"
 
 on:
   workflow_dispatch:
@@ -30,22 +30,6 @@ jobs:
           echo "Branch verification passed."
 
   scale_down:
-<<<<<<< HEAD
-<<<<<<< HEAD
-    needs: safety_checks
-    uses: ./.github/workflows/template-deploy-server.yml
-=======
-    uses: ./.github/workflows/template-deploy-ecs-app.yml
->>>>>>> 20f9f03 (refactor: use hcl partial configs for terraform backend)
-    with:
-      image_uri: "ignore" 
-      git_commit_hash: "ignore"
-      
-      # If dry_run is true, isApply becomes false (uses plan role instead of dev role)
-      isApply: ${{ !inputs.dry_run }}
-      isDestroy: false
-
-=======
     needs: safety_checks
     uses: ./.github/workflows/template-deploy-server.yml
     with:
@@ -54,12 +38,7 @@ jobs:
       
       # If dry_run is true, isApply becomes false (uses plan role instead of dev role)
       isApply: ${{ !inputs.dry_run }}
-<<<<<<< HEAD
->>>>>>> 0cbfebc (Added destroy and stop pipelines for prod and dev)
-=======
       isDestroy: false
-
->>>>>>> 8ca1f4f (Added missing inputs)
       stage: "dev"
       terraformDir: "terraform/server/deploy"
       desired_count: "0"
