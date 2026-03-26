@@ -19,19 +19,6 @@ on:
       terraformDir: 
         required: true
         type: string
-      backendBucket:
-        required: true
-        type: string
-      backendKey:
-        required: true
-        type: string
-      backendRegion:
-        required: false
-        type: string
-        default: "us-east-1"
-      backendDynamoTable:
-        required: true
-        type: string
     secrets:
       role_arn:
         required: true
