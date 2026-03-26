@@ -1,16 +1,42 @@
+# Dev Server Stop
+#
+# Gracefully stops the Dev application by scaling the ECS service to 0.
+# Leaves the underlying infrastructure (VPC, Cluster, etc.) intact.
+# Runs strictly from the 'dev' branch and includes a safe 'Dry Run' mode.
+
 name: Stop Dev Server
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry Run (Terraform Plan only)'
+        required: true
+        type: boolean
+        default: false
 
 jobs:
+  safety_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Branch
+        run: |
+          # Ensure the workflow is only triggered from the dev branch
+          if [[ "${{ github.ref }}" != "refs/heads/dev" ]]; then
+            echo "ERROR: This workflow can only be run from the 'dev' branch."
+            echo "Current branch: ${{ github.ref }}"
+            exit 1
+          fi
+          echo "Branch verification passed."
+
   scale_down:
-    uses: ./.github/workflows/template-deploy-ecs-app.yml
+    needs: safety_checks
+    uses: ./.github/workflows/template-deploy-server.yml
     with:
       image_uri: "ignore" 
       git_commit_hash: "ignore"
-      
-      isApply: true
+      # If dry_run is true, isApply becomes false (uses plan role instead of dev role)
+      isApply: ${{ !inputs.dry_run }}
       stage: "dev"
       terraformDir: "terraform/server/deploy"
       desired_count: "0"
