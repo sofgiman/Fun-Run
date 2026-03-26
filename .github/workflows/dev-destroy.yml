@@ -57,7 +57,11 @@ jobs:
   destroy_server:
     name: Destroy ECS Server
     needs: safety_checks
+<<<<<<< HEAD
     uses: ./.github/workflows/template-deploy-server.yml
+=======
+    uses: ./.github/workflows/template-deploy-ecs-app.yml
+>>>>>>> 20f9f03 (refactor: use hcl partial configs for terraform backend)
     with:
       image_uri: "ignore"
       git_commit_hash: "ignore"
