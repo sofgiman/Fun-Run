@@ -5,7 +5,7 @@ on:
 
 jobs:
   scale_down:
-    uses: ./.github/workflows/deploy-ecs-app-template.yml
+    uses: ./.github/workflows/template-deploy-ecs-app.yml
     with:
       image_uri: "ignore" 
       git_commit_hash: "ignore"
@@ -13,10 +13,6 @@ jobs:
       isApply: true
       stage: "dev"
       terraformDir: "terraform/server/deploy"
-      backendBucket: "fun-run-terraform-state"
-      backendKey: "server/dev/terraform.tfstate"
-      backendRegion: "us-east-1"
-      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
       desired_count: "0"
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_DEV }}

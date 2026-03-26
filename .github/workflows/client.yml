@@ -15,7 +15,7 @@ on:
 
 jobs:
   mac_build:
-    uses: ./.github/workflows/build-client-template.yml
+    uses: ./.github/workflows/template-build-client.yml
     with:
       os: "macos"
       targetPlatform: "StandaloneOSX"
@@ -24,7 +24,7 @@ jobs:
     secrets: inherit
 
   linux_build: 
-    uses: ./.github/workflows/build-client-template.yml
+    uses: ./.github/workflows/template-build-client.yml
     with:
       os: "ubuntu"
       targetPlatform: "StandaloneLinux64"
@@ -33,7 +33,7 @@ jobs:
     secrets: inherit
 
   windows_build:
-    uses: ./.github/workflows/build-client-template.yml
+    uses: ./.github/workflows/template-build-client.yml
     with:
       os: "windows"
       targetPlatform: "StandaloneWindows64"

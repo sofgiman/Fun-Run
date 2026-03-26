@@ -42,7 +42,7 @@ jobs:
   destroy_server:
     name: Destroy ECS Server
     needs: safety_checks
-    uses: ./.github/workflows/deploy-ecs-app-template.yml
+    uses: ./.github/workflows/template-deploy-ecs-app.yml
     with:
       
       image_uri: "ignore"
@@ -69,9 +69,6 @@ jobs:
       isDestroy: true
       stage: "dev"
       terraformDir: "terraform/infrastructure/deploy"
-      backendBucket: "fun-run-terraform-state"
-      backendKey: "infrastructure/dev/terraform.tfstate"
-      backendDynamoTable: "dynamoDB_to_lock_terraform_state"
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_DEV }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
