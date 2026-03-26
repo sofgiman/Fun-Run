@@ -11,14 +11,14 @@ on:
 
 jobs:
   linux_build: 
-    uses: ./.github/workflows/build-server-template.yml
+    uses: ./.github/workflows/template-build-server.yml
     with:
       os: "ubuntu"
       targetPlatform: "StandaloneLinux64"
     secrets: inherit
   
   windows_build:
-    uses: ./.github/workflows/build-server-template.yml
+    uses: ./.github/workflows/template-build-server.yml
     with:
       os: "windows"
       targetPlatform: "StandaloneWindows64"
@@ -44,7 +44,7 @@ jobs:
 
   deploy:
     needs: [ dockerize_and_push, deploy_infrastructure ]
-    uses: ./.github/workflows/deploy-ecs-app-template.yml
+    uses: ./.github/workflows/template-deploy-ecs-app.yml
     with:
       image_uri: ghcr.io/${{ needs.dockerize_and_push.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize_and_push.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize_and_push.outputs.COMMIT_HASH }}
