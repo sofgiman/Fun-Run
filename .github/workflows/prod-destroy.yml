@@ -1,10 +1,10 @@
-# Dev Environment Destroy
+# Prod Environment Destroy
 #
-# Destroys the Dev ECS server and underlying infrastructure.
-# Runs strictly from the 'dev' branch for AWS OIDC compliance.
-# Includes a safe 'Dry Run' mode to preview the Terraform plan.
+# Destroys the Prod ECS server and underlying infrastructure.
+# Runs strictly from the 'main' branch for AWS OIDC compliance.
+# Actual destruction is restricted to 'sofgiman'; 'Dry Run' is available for all.
 
-name: Destroy Dev Environment 
+name: Destroy Prod Environment 
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ on:
         type: boolean
         default: true
       confirm_action:
-        description: 'Are you SURE you want to destroy the DEV environment? (Ignored if Dry Run)'
+        description: 'Are you SURE you want to destroy the PROD environment? (Ignored if Dry Run)'
         required: false
         type: boolean
         default: false
@@ -30,14 +30,25 @@ jobs:
     steps:
       - name: Verify Branch
         run: |
-          # Ensure the workflow is only triggered from the dev branch
+          # Ensure the workflow is only triggered from the main branch
           # This prevents AWS STS AssumeRole failures due to OIDC trust policy
-          if [[ "${{ github.ref }}" != "refs/heads/dev" ]]; then
-            echo "ERROR: This workflow can only be run from the 'dev' branch."
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "ERROR: This workflow can only be run from the 'main' branch."
             echo "Current branch: ${{ github.ref }}"
             exit 1
           fi
           echo "Branch verification passed."
+
+      - name: Verify Authorized User (Only for Apply)
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          # Ensure only 'sofgiman' can actually destroy the Prod environment
+          if [[ "${{ github.actor }}" != "sofgiman" ]]; then
+            echo "ERROR: Unauthorized action. Only 'sofgiman' is allowed to destroy PROD."
+            echo "Attempted by: ${{ github.actor }}"
+            exit 1
+          fi
+          echo "User authorization passed."
 
       - name: Verify Confirmation (Only for Apply)
         if: ${{ inputs.dry_run == false }}
@@ -57,25 +68,17 @@ jobs:
   destroy_server:
     name: Destroy ECS Server
     needs: safety_checks
-<<<<<<< HEAD
-<<<<<<< HEAD
     uses: ./.github/workflows/template-deploy-server.yml
-=======
-    uses: ./.github/workflows/template-deploy-ecs-app.yml
->>>>>>> 20f9f03 (refactor: use hcl partial configs for terraform backend)
-=======
-    uses: ./.github/workflows/template-deploy-server.yml
->>>>>>> 0cbfebc (Added destroy and stop pipelines for prod and dev)
     with:
       image_uri: "ignore"
       git_commit_hash: "ignore"
       # If dry_run is true, isApply becomes false (uses plan role)
       isApply: ${{ !inputs.dry_run }} 
       isDestroy: true  
-      stage: "dev"
+      stage: "prod"
       terraformDir: "terraform/server/deploy"
     secrets: 
-      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_arn: ${{ secrets.AWS_ROLE_PROD }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
 
   destroy_infra:
@@ -86,8 +89,8 @@ jobs:
       # If dry_run is true, isApply becomes false (uses plan role)
       isApply: ${{ !inputs.dry_run }} 
       isDestroy: true
-      stage: "dev"
+      stage: "prod"
       terraformDir: "terraform/infrastructure/deploy"
     secrets: 
-      role_arn: ${{ secrets.AWS_ROLE_DEV }}
+      role_arn: ${{ secrets.AWS_ROLE_PROD }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}

@@ -1,10 +1,10 @@
-name: Prod Server
+name:  Prod Server
 
 on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*'
   pull_request:
     branches:
       - main
@@ -47,9 +47,9 @@ jobs:
 
   deploy_infrastructure:
     needs: verify_branch
-    uses: ./.github/workflows/template-terraform.yml
+    uses: ./.github/workflows/template-deploy-infrastructure.yml
     with:
-      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      isApply: ${{ (github.event_name == 'push' && github.ref_type == 'tag') || (github.event_name == 'workflow_dispatch' && github.ref_name == 'main') }}
       isDestroy: false
       stage: "prod"
       terraformDir: "terraform/infrastructure/deploy"
@@ -66,11 +66,19 @@ jobs:
 
   deploy:
     needs: [ dockerize_and_push, deploy_infrastructure ]
+<<<<<<< HEAD
+<<<<<<< HEAD
+    uses: ./.github/workflows/template-deploy-server.yml
+=======
     uses: ./.github/workflows/template-deploy-ecs-app.yml
+>>>>>>> 20f9f03 (refactor: use hcl partial configs for terraform backend)
+=======
+    uses: ./.github/workflows/template-deploy-server.yml
+>>>>>>> 0cbfebc (Added destroy and stop pipelines for prod and dev)
     with:
       image_uri: ghcr.io/${{ needs.dockerize_and_push.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize_and_push.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize_and_push.outputs.COMMIT_HASH }}
-      isApply: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      isApply: ${{ (github.event_name == 'push' && github.ref_type == 'tag') || (github.event_name == 'workflow_dispatch' && github.ref_name == 'main') }}
       isDestroy: false
       stage: "prod"
       terraformDir: terraform/server/deploy
