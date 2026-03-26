@@ -25,7 +25,7 @@ jobs:
     secrets: inherit
 
   deploy_infrastructure:
-    uses: ./.github/workflows/template-terraform.yml
+    uses: ./.github/workflows/template-deploy-infrastructure.yml
     with:
       isApply: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'dev' }}
       isDestroy: false
@@ -44,7 +44,7 @@ jobs:
 
   deploy:
     needs: [ dockerize_and_push, deploy_infrastructure ]
-    uses: ./.github/workflows/template-deploy-ecs-app.yml
+    uses: ./.github/workflows/template-deploy-server.yml
     with:
       image_uri: ghcr.io/${{ needs.dockerize_and_push.outputs.REPOSITORY_LOWER_CASE }}/fun-run-server:${{ needs.dockerize_and_push.outputs.TAG_NAME }}
       git_commit_hash: ${{ needs.dockerize_and_push.outputs.COMMIT_HASH }}
