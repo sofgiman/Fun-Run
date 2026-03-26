@@ -4,7 +4,7 @@
 # Runs strictly from the 'dev' branch for AWS OIDC compliance.
 # Includes a safe 'Dry Run' mode to preview the Terraform plan.
 
-name: Destroy Dev Environment 
+name: "[Dev] Destroy Environment"
 
 on:
   workflow_dispatch:
@@ -31,7 +31,6 @@ jobs:
       - name: Verify Branch
         run: |
           # Ensure the workflow is only triggered from the dev branch
-          # This prevents AWS STS AssumeRole failures due to OIDC trust policy
           if [[ "${{ github.ref }}" != "refs/heads/dev" ]]; then
             echo "ERROR: This workflow can only be run from the 'dev' branch."
             echo "Current branch: ${{ github.ref }}"
@@ -42,7 +41,6 @@ jobs:
       - name: Verify Confirmation (Only for Apply)
         if: ${{ inputs.dry_run == false }}
         run: |
-          # Validate user confirmation inputs before proceeding with destruction
           if [[ "${{ inputs.confirm_action }}" != "true" ]]; then
             echo "ERROR: You must check the confirmation box to apply destroy."
             exit 1
@@ -57,15 +55,7 @@ jobs:
   destroy_server:
     name: Destroy ECS Server
     needs: safety_checks
-<<<<<<< HEAD
-<<<<<<< HEAD
     uses: ./.github/workflows/template-deploy-server.yml
-=======
-    uses: ./.github/workflows/template-deploy-ecs-app.yml
->>>>>>> 20f9f03 (refactor: use hcl partial configs for terraform backend)
-=======
-    uses: ./.github/workflows/template-deploy-server.yml
->>>>>>> 0cbfebc (Added destroy and stop pipelines for prod and dev)
     with:
       image_uri: "ignore"
       git_commit_hash: "ignore"
@@ -83,7 +73,6 @@ jobs:
     needs: destroy_server 
     uses: ./.github/workflows/template-deploy-infrastructure.yml 
     with:
-      # If dry_run is true, isApply becomes false (uses plan role)
       isApply: ${{ !inputs.dry_run }} 
       isDestroy: true
       stage: "dev"

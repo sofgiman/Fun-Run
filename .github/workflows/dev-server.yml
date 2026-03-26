@@ -1,4 +1,4 @@
-name: Dev Server
+name: "[Dev] Deploy Server"
 
 on:
   workflow_dispatch:
