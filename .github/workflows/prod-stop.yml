@@ -46,8 +46,11 @@ jobs:
     with:
       image_uri: "ignore" 
       git_commit_hash: "ignore"
+
       # If dry_run is true, isApply becomes false (uses plan role instead of prod role)
       isApply: ${{ !inputs.dry_run }}
+      isDestroy: false
+
       stage: "prod"
       terraformDir: "terraform/server/deploy"
       desired_count: "0"
