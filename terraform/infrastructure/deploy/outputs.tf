@@ -32,3 +32,8 @@ output "target_group_arn" {
   description = "Target Group ARN for the ECS Service"
   value       = module.nlb.target_group_arn
 }
+
+output "nlb_dns_name" {
+  description = "The public DNS name of the Network Load Balancer"
+  value       = module.nlb.nlb_dns_name
+}
