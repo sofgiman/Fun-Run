@@ -12,4 +12,7 @@ public_subnet_cidrs = [
 
 enable_execute_command = false
 
+domain_name = "idanyafe.com"
 subdomain = "fun-run"  
+
+health_check_port = 80
