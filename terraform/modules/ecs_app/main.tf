@@ -37,6 +37,18 @@ resource "aws_ecs_task_definition" "this" {
       }
 
       readonlyRootFilesystem = var.readonlyRootFilesystem
+    },
+    {
+      name      = "health-check-sidecar"
+      image     = "nginx:alpine"
+      essential = true
+      portMappings = [
+        {
+          containerPort = var.health_check_port
+          hostPort      = var.health_check_port
+          protocol      = "tcp"
+        }
+      ]
     }
   ])
 }
@@ -49,6 +61,7 @@ resource "aws_ecs_service" "this" {
   desired_count          = var.desired_count
   launch_type            = "FARGATE"
   enable_execute_command = var.enable_execute_command
+  health_check_grace_period_seconds = var.health_check_grace_period
 
   load_balancer {
     target_group_arn = var.target_group_arn
@@ -75,6 +88,14 @@ resource "aws_security_group" "ecs_service_sg" {
     from_port   = var.container_port
     to_port     = var.container_port
     protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow health check port
+  ingress {
+    from_port   = var.health_check_port
+    to_port     = var.health_check_port
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 

@@ -7,6 +7,10 @@ variable "game_port" {
   type = number 
   default = 7777
 }
+variable "health_check_port" { 
+  type = number 
+  default = 80
+}
 variable "domain_name" {
   description = "The root domain name (e.g., mygame.com). Leave empty if you don't have one yet."
   type = string

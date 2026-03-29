@@ -96,6 +96,11 @@ variable "readonlyRootFilesystem" {
   default = true
 }
 
+variable "health_check_port" {
+  type    = number
+  default = 80
+}
+
 
 variable "desired_count" {
   type        = number
@@ -109,6 +114,11 @@ variable "enable_execute_command" {
   default = false
 }
 
+variable "health_check_grace_period" {
+  description = "The grace period in seconds for the health check."
+  type        = number
+  default     = 60
+}
 
 # Whether to assign a public IP to the service
 variable "assign_public_ip" {
@@ -126,3 +136,4 @@ variable "target_group_arn" {
   description = "The ARN of the NLB Target Group to connect the ECS service to"
   type        = string
 }
+

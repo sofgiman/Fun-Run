@@ -7,3 +7,8 @@ output "nlb_dns_name" {
   description = "The DNS name of the Load Balancer"
   value       = aws_lb.this.dns_name
 }
+
+output "health_check_port" {
+  description = "The port used for NLB health checks"
+  value       = var.health_check_port
+}

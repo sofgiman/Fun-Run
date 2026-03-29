@@ -27,7 +27,7 @@ resource "aws_lb_target_group" "udp_7777" {
 
   health_check {
     protocol = "TCP" 
-    port     = var.game_port
+    port     = var.health_check_port
     healthy_threshold   = 3
     unhealthy_threshold = 3
     interval            = 30
