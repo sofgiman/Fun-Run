@@ -43,5 +43,4 @@ module "nlb" {
   subdomain      = var.subdomain
 
   health_check_port         = var.health_check_port
-  health_check_grace_period = var.health_check_grace_period
 }
