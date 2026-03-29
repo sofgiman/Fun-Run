@@ -1,20 +1,22 @@
 # prod.tfvars
-project     = "fun-run"
-environment = "prod"       
-region      = "us-east-1"
-tf_state_bucket = "fun-run-terraform-state"
+core_config = {
+  project         = "fun-run"
+  environment     = "prod"
+  region          = "us-east-1"
+  tf_state_bucket = "fun-run-terraform-state"
+}
 
-service_name  = "server"
-desired_count = 1         
-health_check_grace_period = 60
+app_config = {
+  service_name           = "server"
+  desired_count          = 1
+  cpu                    = "256"
+  memory                 = "512"
+  readonlyRootFilesystem = false # false because SQLite needs writable file system
+}
 
-cpu    = "256"  # 0.25 vCPU
-memory = "512"  # 0.5 GB RAM
-
-# network and mirror config
-server_port      = 7777
-server_protocol  = "udp"  
-assign_public_ip = true   
-
-# sqlite needs writable file system
-readonlyRootFilesystem = false
+network_config = {
+  server_port               = 7777
+  server_protocol           = "udp"
+  assign_public_ip          = true
+  health_check_grace_period = 60
+}
