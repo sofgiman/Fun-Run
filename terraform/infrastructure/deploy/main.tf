@@ -39,7 +39,7 @@ module "nlb" {
   public_subnets = module.network.public_subnets
   
   # Leave empty if don't have a domain name yet, it will create NLB without domain name
-  domain_name    = "" 
+  domain_name    = var.domain_name 
   subdomain      = var.subdomain
 
   health_check_port         = var.health_check_port
