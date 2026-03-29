@@ -12,4 +12,5 @@ public_subnet_cidrs = [
 
 enable_execute_command = true
 
+domain_name = "idanyafe.com"
 subdomain = "fun-run-dev"  

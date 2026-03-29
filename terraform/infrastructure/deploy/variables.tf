@@ -31,6 +31,11 @@ variable "enable_execute_command" {
   default = false
 }
 
+variable domain_name" {
+  type    = string
+  default = ""
+}
+
 variable "subdomain" {
   description = "The subdomain for the environment (e.g., play, funrun-dev)"
   type        = string
