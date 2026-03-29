@@ -11,3 +11,5 @@ public_subnet_cidrs = [
 ]
 
 enable_execute_command = false
+
+subdomain = "fun-run"  

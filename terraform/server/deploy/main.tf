@@ -49,6 +49,7 @@ module "ecs_app" {
   assign_public_ip       = var.assign_public_ip
   log_retention_days     = 30
 
+  target_group_arn = data.terraform_remote_state.infra.outputs.target_group_arn
 }
 
 

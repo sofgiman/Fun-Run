@@ -28,3 +28,7 @@ output "ecs_execution_role_name" {
   value       = module.ecs_infra.ecs_execution_role_name
 }
 
+output "target_group_arn" {
+  description = "Target Group ARN for the ECS Service"
+  value       = module.nlb.target_group_arn
+}

@@ -28,3 +28,17 @@ module "ecs_infra" {
   region      = var.region
 
 }
+
+module "nlb" {
+  source         = "../../modules/nlb"
+  project        = var.project
+  environment    = var.environment
+  region         = var.region
+  
+  vpc_id         = module.network.vpc_id
+  public_subnets = module.network.public_subnets
+  
+  # Leave empty if don't have a domain name yet, it will create NLB without domain name
+  domain_name    = "" 
+  subdomain      = var.subdomain
+}

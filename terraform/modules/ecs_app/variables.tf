@@ -122,3 +122,7 @@ variable "log_retention_days" {
   default = 30
 }
 
+variable "target_group_arn" {
+  description = "The ARN of the NLB Target Group to connect the ECS service to"
+  type        = string
+}
