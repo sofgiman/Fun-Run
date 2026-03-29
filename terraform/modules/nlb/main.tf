@@ -9,7 +9,8 @@ resource "aws_lb" "this" {
   load_balancer_type = "network"
   subnets            = var.public_subnets
 
-  enable_deletion_protection = false
+  enable_deletion_protection       = false
+  enable_cross_zone_load_balancing = true
 
   tags = {
     Name = "${var.project}-${var.environment}-nlb"
