@@ -35,6 +35,9 @@ module "ecs_app" {
   execution_role_arn  = data.terraform_remote_state.infra.outputs.ecs_execution_role_arn
   execution_role_name = data.terraform_remote_state.infra.outputs.ecs_execution_role_name
 
+  target_group_arn  = data.terraform_remote_state.infra.outputs.target_group_arn
+  health_check_port = data.terraform_remote_state.infra.outputs.health_check_port
+
   image_uri       = var.image_uri
   git_commit_hash = var.git_commit_hash
 
@@ -48,8 +51,7 @@ module "ecs_app" {
   enable_execute_command = true
   assign_public_ip       = var.assign_public_ip
   log_retention_days     = 30
-
-  target_group_arn = data.terraform_remote_state.infra.outputs.target_group_arn
+  health_check_grace_period = var.health_check_grace_period
 }
 
 

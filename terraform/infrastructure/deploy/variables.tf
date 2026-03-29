@@ -36,3 +36,13 @@ variable "subdomain" {
   type        = string
   default     = ""
 }
+
+variable "health_check_port" {
+  type    = number
+  default = 80
+}
+
+variable "health_check_grace_period" {
+  type    = number
+  default = 60
+}

@@ -6,6 +6,7 @@ tf_state_bucket = "fun-run-terraform-state"
 
 service_name  = "server"
 desired_count = 1         
+health_check_grace_period = 60
 
 cpu    = "256"  # 0.25 vCPU
 memory = "512"  # 0.5 GB RAM

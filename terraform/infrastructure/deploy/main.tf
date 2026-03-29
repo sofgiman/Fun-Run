@@ -41,4 +41,7 @@ module "nlb" {
   # Leave empty if don't have a domain name yet, it will create NLB without domain name
   domain_name    = "" 
   subdomain      = var.subdomain
+
+  health_check_port         = var.health_check_port
+  health_check_grace_period = var.health_check_grace_period
 }

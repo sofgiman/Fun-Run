@@ -37,3 +37,7 @@ output "nlb_dns_name" {
   description = "The public DNS name of the Network Load Balancer"
   value       = module.nlb.nlb_dns_name
 }
+
+output "health_check_port" {
+  value = module.nlb.health_check_port
+}
