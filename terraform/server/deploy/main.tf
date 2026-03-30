@@ -50,6 +50,7 @@ module "ecs_app" {
   memory                 = var.app_config.memory
   readonlyRootFilesystem = var.app_config.readonlyRootFilesystem
   desired_count          = var.app_config.desired_count
+  efs_mount_path         = var.app_config.efs_mount_path
   
   # CI/CD Injected
   image_uri       = var.image_uri

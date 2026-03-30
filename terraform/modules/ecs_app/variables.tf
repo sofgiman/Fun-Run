@@ -50,6 +50,12 @@ variable "memory" {
   default = "512"
 }
 
+variable "efs_mount_path" {
+  description = "The path inside the container where EFS is mounted"
+  type        = string
+  default     = "/data"
+}
+
 variable "container_port" {
   type    = number
   default = 7777

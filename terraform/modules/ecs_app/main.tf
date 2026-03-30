@@ -28,20 +28,20 @@ resource "aws_ecs_task_definition" "this" {
       image     = var.image_uri
       essential = true
 
-      # Allow Unity and SSM Agent to run in Read-Only
-      linuxParameters = {
-        initProcessEnabled = true
-        tmpfs = [
-          { containerPath = "/tmp", size = 64 },
-          { containerPath = "/var/lib/amazon/ssm", size = 16 }
-        ]
-      }
-
       # Set the environment variable to point to the EFS mount point
       environment = [
         {
           name  = "FUN_RUN_DATA_PATH"
-          value = "/app/data"
+          value = var.efs_mount_path
+        }
+      ]
+
+      # Mount the EFS volume to the requested path
+      mountPoints = [
+        {
+          sourceVolume  = "efs-storage"
+          containerPath = var.efs_mount_path
+          readOnly      = false
         }
       ]
 

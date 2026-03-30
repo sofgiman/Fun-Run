@@ -11,7 +11,8 @@ app_config = {
   desired_count          = 1
   cpu                    = "256"
   memory                 = "512"
-  readonlyRootFilesystem = true # false if SQLite is local then it needs writable file system
+  readonlyRootFilesystem = true # needs to be false if SQLite is local (not using EFS)
+  efs_mount_path         = "/data"
 }
 
 network_config = {
