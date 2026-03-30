@@ -24,6 +24,7 @@ resource "aws_lb_target_group" "udp_7777" {
   protocol    = "UDP"
   vpc_id      = var.vpc_id
   target_type = "ip" 
+  deregistration_delay = 30
 
   health_check {
     protocol = "TCP" 
