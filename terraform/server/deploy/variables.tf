@@ -16,6 +16,7 @@ variable "app_config" {
     cpu                    = string
     memory                 = string
     readonlyRootFilesystem = bool
+    efs_mount_path         = string
   })
 }
 
