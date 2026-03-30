@@ -101,6 +101,8 @@ resource "aws_ecs_service" "this" {
   launch_type                       = "FARGATE"
   enable_execute_command            = var.enable_execute_command
   health_check_grace_period_seconds = var.health_check_grace_period
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent         = 100
 
   load_balancer {
     target_group_arn = var.target_group_arn
