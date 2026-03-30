@@ -21,6 +21,16 @@ module "network" {
   public_subnet_cidrs = var.network_config.public_subnet_cidrs
 }
 
+module "efs" {
+  source      = "../../modules/efs"
+  project     = var.core_config.project
+  environment = var.core_config.environment
+
+  vpc_id   = module.network.vpc_id
+  vpc_cidr = var.network_config.vpc_cidr
+  subnets  = module.network.public_subnets
+}
+
 module "ecs_infra" {
   source      = "../../modules/ecs_infra"
   project     = var.core_config.project
