@@ -49,3 +49,21 @@ resource "aws_iam_role_policy" "ecs_exec_policy" {
   role   = aws_iam_role.ecs_task_role.name
   policy = data.aws_iam_policy_document.ecs_exec[0].json
 }
+
+# Allow the ECS Task to Read and Write to the EFS
+data "aws_iam_policy_document" "ecs_efs_access" {
+  statement {
+    actions = [
+      "elasticfilesystem:ClientMount",
+      "elasticfilesystem:ClientWrite",
+      "elasticfilesystem:ClientRootAccess"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "ecs_efs_policy" {
+  name   = "${var.project}-${var.environment}-ecs-efs-policy"
+  role   = aws_iam_role.ecs_task_role.name
+  policy = data.aws_iam_policy_document.ecs_efs_access.json
+}

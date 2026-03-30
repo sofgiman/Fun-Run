@@ -11,7 +11,7 @@ app_config = {
   desired_count          = 1
   cpu                    = "256"
   memory                 = "512"
-  readonlyRootFilesystem = false # false because SQLite needs writable file system
+  readonlyRootFilesystem = true # false if SQLite is local then it needs writable file system
 }
 
 network_config = {

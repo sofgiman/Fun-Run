@@ -14,11 +14,37 @@ resource "aws_ecs_task_definition" "this" {
   execution_role_arn       = var.execution_role_arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
+  volume {
+    name = "efs-storage"
+    efs_volume_configuration {
+      file_system_id     = var.efs_id
+      transit_encryption = "ENABLED"
+    }
+  }
+  
   container_definitions = jsonencode([
     {
       name      = var.service_name
       image     = var.image_uri
       essential = true
+
+      # Set the environment variable to point to the EFS mount point
+      environment = [
+        {
+          name  = "FUN_RUN_DATA_PATH"
+          value = "/app/data"
+        }
+      ]
+
+      # Mount the EFS volume to /app/data
+      mountPoints = [
+        {
+          sourceVolume  = "efs-storage"
+          containerPath = "/app/data"  # <--- This is the path inside the container
+          readOnly      = false
+        }
+      ]
+
       portMappings = [
         {
           containerPort = var.container_port
