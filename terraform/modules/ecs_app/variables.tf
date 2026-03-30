@@ -89,6 +89,11 @@ variable "target_group_arn" {
   type = string
 }
 
+variable "efs_id" {
+  description = "The ID of the EFS file system for persistent storage"
+  type        = string
+}
+
 # sg.tf (Networking)
 variable "vpc_id" {
   type = string

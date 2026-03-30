@@ -42,6 +42,7 @@ module "ecs_app" {
   execution_role_name = local.infra.ecs_execution_role_name
   target_group_arn    = local.infra.target_group_arn
   health_check_port   = local.infra.health_check_port
+  efs_id              = local.infra.efs_id
 
   # App Specs
   service_name           = var.app_config.service_name
