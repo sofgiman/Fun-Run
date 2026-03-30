@@ -1,69 +1,44 @@
-
+# core
 variable "project" {
-  description = "fun-run"
-  type        = string
-}
-
-variable "environment" {
-  description = "Environment name (dev, prod)"
-  type        = string
-  default     = "dev"
-}
-
-variable "region" {
-  description = "AWS region"
-  type        = string
-  default     = "us-east-1"
-}
-
-# Network Module
-variable "vpc_id" {
   type = string
 }
 
-variable "public_subnets_id" {
-  description = "List of subnet ids"
-  type        = list(string)
+variable "environment" {
+  type    = string
+  default = "dev"
 }
 
+variable "region" {
+  type    = string
+  default = "us-east-1"
+}
 
-# ECS Module
+# main.tf (ECS & Task)
 variable "ecs_cluster_id" {
-  description = "The ID of the ECS cluster"
+  type = string
 }
 
 variable "execution_role_arn" {
-  description = "ECS task arn"
+  type = string
 }
 
 variable "execution_role_name" {
-  description = "ECS task name"
+  type = string
 }
 
-
-
-# Server Container Specs
-
-# Name of the ECS service
 variable "service_name" {
-  description = "The name of the ECS service."
-  type        = string
-  default     = "server"
+  type    = string
+  default = "server"
 }
-
 
 variable "image_uri" {
-  description = "The image URI to deploy"
-  type        = string
+  type = string
 }
 
-# To allow redeploy of a task when using same image 
 variable "git_commit_hash" {
-  description = "The image tag hash"
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
-
 
 variable "cpu" {
   type    = string
@@ -75,46 +50,40 @@ variable "memory" {
   default = "512"
 }
 
-# Container port to expose
-variable "container_port" {
-  type        = number
-  default     = 7777
-  description = "The port on which the container will listen."
+variable "efs_mount_path" {
+  description = "The path inside the container where EFS is mounted"
+  type        = string
+  default     = "/data"
 }
 
-# Container port to expose
+variable "container_port" {
+  type    = number
+  default = 7777
+}
+
 variable "protocol" {
   type    = string
   default = "udp"
 }
 
-
-# Needed to be true when sqlite is on file system
-# false when mounting efs for sqlite
 variable "readonlyRootFilesystem" {
   type    = bool
   default = true
 }
 
-
 variable "desired_count" {
-  type        = number
-  default     = 1
-  description = "The number of ECS tasks to run."
+  type    = number
+  default = 1
 }
 
-# Allow to exec into the container
-variable "enable_execute_command" {
-  type    = bool
-  default = false
+variable "health_check_port" {
+  type    = number
+  default = 80
 }
 
-
-# Whether to assign a public IP to the service
-variable "assign_public_ip" {
-  type        = bool
-  default     = true
-  description = "Whether to assign a public IP to the ECS service tasks."
+variable "health_check_grace_period" {
+  type    = number
+  default = 60
 }
 
 variable "log_retention_days" {
@@ -122,3 +91,31 @@ variable "log_retention_days" {
   default = 30
 }
 
+variable "target_group_arn" {
+  type = string
+}
+
+variable "efs_id" {
+  description = "The ID of the EFS file system for persistent storage"
+  type        = string
+}
+
+# sg.tf (Networking)
+variable "vpc_id" {
+  type = string
+}
+
+variable "public_subnets_id" {
+  type = list(string)
+}
+
+variable "assign_public_ip" {
+  type    = bool
+  default = true
+}
+
+# iam.tf (Permissions)
+variable "enable_execute_command" {
+  type    = bool
+  default = false
+}
