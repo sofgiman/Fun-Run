@@ -9,6 +9,7 @@ public class GameManagerServer : NetworkBehaviour
     private const int MAX_PLAYERS_IN_GAME = 4;
     private const int MIN_PLAYERS_IN_GAME = 2;
     private const int TIME_TO_WAIT_FOR_MORE_PLAYERS = 6;  // the time to wait after the minimum players count achived
+    private const float MAX_GAME_TIME = 90f;
     
     private Dictionary<string,string> playerNameToSkinName; // dict to get the skin name of each player
     // players names that will be ordered by their place (1st place will be at the 0 index)   
@@ -24,6 +25,8 @@ public class GameManagerServer : NetworkBehaviour
     private bool gameStarted;  // flag to know if game started
     private bool gameFinished;  // flag to know if game finished
     private bool checkedForMorePlayers;  // flag to know if after minimum players joined the search for more players started
+    private float gameTimer; // Total time in seconds for a game
+    private bool timerRunning = false; // Flag to indicate if the timer is currently active
     float[] startPositionsX = {-1f, -0.5f, 0f, 0.5f};  // different positions for each player (so they won't spawn on eachother)
     int spawnIndexPosition;  
 
@@ -42,6 +45,7 @@ public class GameManagerServer : NetworkBehaviour
         spawnIndexPosition= 0;
         gameStarted = false;
         gameFinished = false;
+        gameTimer = MAX_GAME_TIME;
 
         NetworkServer.RegisterHandler<PlayRequestMessage>(OnCheckCanPlay);  
     }
@@ -51,7 +55,17 @@ public class GameManagerServer : NetworkBehaviour
             // Finish game and reset variables 
             gameFinished= false;
             FinishGame();
-            ResetGameManager();            
+            ResetGameManager();   
+            return;         
+        }
+
+        if (!isServer || !timerRunning) 
+            return;
+
+        gameTimer -= Time.deltaTime;
+        if (gameTimer <= 0) {
+            print("Force finishing game due to exceeded time limit");
+            ForceFinishGame();
         }
     }
     // A func to that take a network meassage and send the message to all client in the game
@@ -70,13 +84,13 @@ public class GameManagerServer : NetworkBehaviour
 
         string username = prm.username;
 
-        // Prevent joining if user is already in the match
+        // Prevent joining if user is already in the game
         if (playerNameToSkinName.ContainsKey(username)) 
         {
             NetworkServer.SetClientNotReady(conn);
             
             CanNotPlayMessage cnpm = new CanNotPlayMessage();
-            cnpm.message = "User is already in a match";
+            cnpm.message = "User is already in a game";
             conn.Send<CanNotPlayMessage>(cnpm);
             
             return;
@@ -131,6 +145,7 @@ public class GameManagerServer : NetworkBehaviour
         SendToAllPlayers<StartCountdownMessege>(new StartCountdownMessege());   
         yield return new WaitForSeconds(3);
         SendToAllPlayers<StartGameMessage>(new StartGameMessage());  // Sending the start game message( allowing players to move)
+        timerRunning = true; // Start the global game timer when players can move
         yield break;
     }
     #endregion
@@ -167,6 +182,37 @@ public class GameManagerServer : NetworkBehaviour
        
     }
 
+    // A function to handle the scenario where the game time runs out 
+    // before all players reach the finish line. It assigns the remaining 
+    // players to the end of the arrays as DNF (Did Not Finish).
+    private void ForceFinishGame() {
+        timerRunning = false;
+        
+        // Iterate through all players who originally joined the game
+        foreach (var entry in playerNameToSkinName) {
+            bool alreadyFinished = false;
+            
+            // Check if this player is already in the finished players array
+            for (int i = 0; i < orderedPlayersFinishIndex; i++) {
+                if (playersNamesOrdered[i] == entry.Key) {
+                    alreadyFinished = true;
+                    break;
+                }
+            }
+
+            // If the player hasn't finished, append them to the arrays
+            if (!alreadyFinished) {
+                playersNamesOrdered[orderedPlayersFinishIndex] = entry.Key;
+                playersSkinsNamesOrdered[orderedPlayersFinishIndex] = entry.Value;
+                orderedPlayersFinishIndex++;
+            }
+        }
+        
+        // Now that the arrays are full, trigger the gameFinished flag!
+        // The original logic in Update() will catch this and finish the game.
+        gameFinished = true; 
+    }
+
     // Func to reset all of the game manager variables
     private void ResetGameManager(){
         orderedPlayersFinishIndex = 0;
@@ -181,6 +227,8 @@ public class GameManagerServer : NetworkBehaviour
         }
         playerNameToSkinName.Clear();
         connsInGame.Clear();
+        gameTimer = MAX_GAME_TIME; // Reset the timer for the next game
+        timerRunning = false;   
     }
     #endregion
 
