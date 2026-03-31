@@ -159,7 +159,8 @@ public class MyNetworkManager : NetworkManager
     /// </summary>
     /// <param name="conn">Connection from client.</param>
     public override void OnServerConnect(NetworkConnection conn) { 
-        print("A client with " + conn.connectionId + " connection ID has connected" );
+        base.OnServerConnect(conn);
+        Debug.Log($"A client with {conn.connectionId} connection ID has connected");
     }
     
     /// <summary>
@@ -193,7 +194,14 @@ public class MyNetworkManager : NetworkManager
     /// <param name="conn">Connection from client.</param>
     public override void OnServerDisconnect(NetworkConnection conn)
     {
+        // Find the GameManagerServer in the scene and notify it
+        GameManagerServer gms = FindFirstObjectByType<GameManagerServer>();
+        if (gms != null) {
+            gms.HandlePlayerDisconnect(conn);
+        }
+        Debug.Log($"A client with {conn.connectionId} connection ID has disconnected");
         base.OnServerDisconnect(conn);
+        
     }
 
     /// <summary>
