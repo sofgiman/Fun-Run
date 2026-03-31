@@ -67,6 +67,21 @@ public class GameManagerServer : NetworkBehaviour
     // A callback from a client to check if he can play
     // recive net connection of client and the play request message
     private void OnCheckCanPlay(NetworkConnection conn,  PlayRequestMessage prm){
+
+        string username = prm.username;
+
+        // Prevent joining if user is already in the match
+        if (playerNameToSkinName.ContainsKey(username)) 
+        {
+            NetworkServer.SetClientNotReady(conn);
+            
+            CanNotPlayMessage cnpm = new CanNotPlayMessage();
+            cnpm.message = "User is already in a match";
+            conn.Send<CanNotPlayMessage>(cnpm);
+            
+            return;
+        }
+
         if (playersInGame >= MAX_PLAYERS_IN_GAME || gameStarted){  // if game started or there's max players
             NetworkServer.SetClientNotReady(conn);  // not allowing client to play
             CanNotPlayMessage cnpm = new CanNotPlayMessage();
@@ -81,7 +96,6 @@ public class GameManagerServer : NetworkBehaviour
             connsInGame.Add(conn);  // adding his conn to conn list
             connsInGame[playersInGame] = conn;  // adding his conn to conns list
             playersInGame ++;
-            string username = prm.username;
             string skinName = prm.skinName;
             SpawnPlayer(conn, username, skinName);  // spawning the player
             playerNameToSkinName.Add(username,skinName);  // adding user to dict so we'll know user skin (usen in podium creation)
