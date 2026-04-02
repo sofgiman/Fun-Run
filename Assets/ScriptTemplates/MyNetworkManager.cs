@@ -207,7 +207,7 @@ public class MyNetworkManager : NetworkManager {
     /// </summary>
     /// <param name="conn">Connection to the server.</param>
     public override void OnClientConnect(NetworkConnection conn) {
-        print("connected to server");
+        Debug.Log($"[Network] Client connected to server at {networkAddress}");
     }
 
     /// <summary>
@@ -217,6 +217,11 @@ public class MyNetworkManager : NetworkManager {
     /// <param name="conn">Connection to the server.</param>
     public override void OnClientDisconnect(NetworkConnection conn) {
         base.OnClientDisconnect(conn);
+
+        // Notify the UI that the connection dropped (e.g. Server down, KCP Timeout, Firewall block)
+        if (uiHandlerScript != null) {
+            uiHandlerScript.OnConnectionLost();
+        }
     }
 
     /// <summary>
@@ -265,8 +270,7 @@ public class MyNetworkManager : NetworkManager {
     /// <summary>
     /// This is invoked when the client is started.
     /// </summary>
-    public override void OnStartClient() {
-    }
+    public override void OnStartClient() { }
 
 
     /// <summary>
