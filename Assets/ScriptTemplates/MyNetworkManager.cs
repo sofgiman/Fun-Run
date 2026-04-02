@@ -15,18 +15,16 @@ using Mirror;
 	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkManager.html
 */
 
-public class MyNetworkManager : NetworkManager
-{
-  
+public class MyNetworkManager : NetworkManager {
+
     private GameObject uiHandlerGameObject;
     private UIHandler uiHandlerScript;
     private MyAuthentication myAuthenticatetor;
-
+    private const string PROD_SERVER_ADDRESS = "fun-run.idanyafe.com";
 
     #region Unity Callbacks
 
-    public override void OnValidate()
-    {
+    public override void OnValidate() {
         base.OnValidate();
     }
 
@@ -34,8 +32,7 @@ public class MyNetworkManager : NetworkManager
     /// Runs on both Server and Client
     /// Networking is NOT initialized when this fires
     /// </summary>
-    public override void Awake()
-    {
+    public override void Awake() {
         base.Awake();
     }
 
@@ -43,42 +40,37 @@ public class MyNetworkManager : NetworkManager
     /// Runs on both Server and Client
     /// Networking is NOT initialized when this fires
     /// </summary>
-    public override void Start()
-    {
+    public override void Start() {
         base.Start();  // starting server if "server build" is ticked in settings 
- 
-        uiHandlerGameObject = GameObject.Find("ClientManager");  
+
+        uiHandlerGameObject = GameObject.Find("ClientManager");
         uiHandlerScript = uiHandlerGameObject.GetComponent<UIHandler>();
-        
-        if(!NetworkServer.active){  // if server not active then connect to client
-            if(File.Exists("IP Address.txt")){  // if finiding txt file of the IP address
-                StreamReader sr = new StreamReader("IP Address.txt");
-                string serverIPAddress = sr.ReadToEnd();
-                sr.Close();
-                networkAddress = serverIPAddress;  // set network address (server IP)
-            }
-            else{
-                networkAddress = "localhost";  // // set network address to localhost (default)
-            }
+
+        if (!NetworkServer.active) {  // if server not active then connect to client
+
+#if UNITY_EDITOR
+            Debug.Log("[Network] Running in Editor. Defaulting to localhost.");
+            networkAddress = "localhost";
+#else
+            networkAddress = GetServerAddress();
+#endif
 
             base.StartClient();  // starting client
             uiHandlerScript.StartScreen();  // go to the first screen (sign in screen)
-        } 
+        }
     }
 
     /// <summary>
     /// Runs on both Server and Client
     /// </summary>
-    public override void LateUpdate()
-    {
+    public override void LateUpdate() {
         base.LateUpdate();
     }
 
     /// <summary>
     /// Runs on both Server and Client
     /// </summary>
-    public override void OnDestroy()
-    {
+    public override void OnDestroy() {
         base.OnDestroy();
     }
 
@@ -90,16 +82,14 @@ public class MyNetworkManager : NetworkManager
     /// Set the frame rate for a headless server.
     /// <para>Override if you wish to disable the behavior or set your own tick rate.</para>
     /// </summary>
-    public override void ConfigureHeadlessFrameRate()
-    {
+    public override void ConfigureHeadlessFrameRate() {
         base.ConfigureHeadlessFrameRate();
     }
 
     /// <summary>
     /// called when quitting the application by closing the window / pressing stop in the editor
     /// </summary>
-    public override void OnApplicationQuit()
-    {
+    public override void OnApplicationQuit() {
         base.OnApplicationQuit();
     }
 
@@ -112,8 +102,7 @@ public class MyNetworkManager : NetworkManager
     /// <para>Clients that connect to this server will automatically switch to this scene. This is called automatically if onlineScene or offlineScene are set, but it can be called from user code to switch scenes again while the game is in progress. This automatically sets clients to be not-ready. The clients must call NetworkClient.Ready() again to participate in the new scene.</para>
     /// </summary>
     /// <param name="newSceneName"></param>
-    public override void ServerChangeScene(string newSceneName)
-    {
+    public override void ServerChangeScene(string newSceneName) {
         base.ServerChangeScene(newSceneName);
     }
 
@@ -144,8 +133,7 @@ public class MyNetworkManager : NetworkManager
     /// <para>Scene changes can cause player objects to be destroyed. The default implementation of OnClientSceneChanged in the NetworkManager is to add a player object for the connection if no player object exists.</para>
     /// </summary>
     /// <param name="conn">The network connection that the scene change message arrived on.</param>
-    public override void OnClientSceneChanged(NetworkConnection conn)
-    {
+    public override void OnClientSceneChanged(NetworkConnection conn) {
         base.OnClientSceneChanged(conn);
     }
 
@@ -158,19 +146,18 @@ public class MyNetworkManager : NetworkManager
     /// <para>Unity calls this on the Server when a Client connects to the Server. Use an override to tell the NetworkManager what to do when a client connects to the server.</para>
     /// </summary>
     /// <param name="conn">Connection from client.</param>
-    public override void OnServerConnect(NetworkConnection conn) { 
+    public override void OnServerConnect(NetworkConnection conn) {
         base.OnServerConnect(conn);
         Debug.Log($"A client with {conn.connectionId} connection ID has connected");
     }
-    
+
     /// <summary>
     /// Called on the server when a client is ready.
     /// <para>The default implementation of this function calls NetworkServer.SetClientReady() to continue the network setup process.</para>
     /// </summary>
     /// <param name="conn">Connection from client.</param>
-    
-    public override void OnServerReady(NetworkConnection conn)
-    {
+
+    public override void OnServerReady(NetworkConnection conn) {
         base.OnServerReady(conn);
     }
 
@@ -179,9 +166,8 @@ public class MyNetworkManager : NetworkManager
     /// <para>The default implementation for this function creates a new player object from the playerPrefab.</para>
     /// </summary>
     /// <param name="conn">Connection from client.</param>
-    public override void OnServerAddPlayer(NetworkConnection conn)
-    {   
-        
+    public override void OnServerAddPlayer(NetworkConnection conn) {
+
         //playerPrefab.GetComponent<Animator>().runtimeAnimatorController = zoeanim as RuntimeAnimatorController;
         //playerPrefab.GetComponent<Animator>().runtimeAnimatorController = 
         base.OnServerAddPlayer(conn);
@@ -192,8 +178,7 @@ public class MyNetworkManager : NetworkManager
     /// <para>This is called on the Server when a Client disconnects from the Server. Use an override to decide what should happen when a disconnection is detected.</para>
     /// </summary>
     /// <param name="conn">Connection from client.</param>
-    public override void OnServerDisconnect(NetworkConnection conn)
-    {
+    public override void OnServerDisconnect(NetworkConnection conn) {
         // Find the GameManagerServer in the scene and notify it
         GameManagerServer gms = FindFirstObjectByType<GameManagerServer>();
         if (gms != null) {
@@ -201,7 +186,7 @@ public class MyNetworkManager : NetworkManager
         }
         Debug.Log($"A client with {conn.connectionId} connection ID has disconnected");
         base.OnServerDisconnect(conn);
-        
+
     }
 
     /// <summary>
@@ -221,9 +206,8 @@ public class MyNetworkManager : NetworkManager
     /// <para>The default implementation of this function sets the client as ready and adds a player. Override the function to dictate what happens when the client connects.</para>
     /// </summary>
     /// <param name="conn">Connection to the server.</param>
-    public override void OnClientConnect(NetworkConnection conn)
-    {
-        print("connected to server");
+    public override void OnClientConnect(NetworkConnection conn) {
+        Debug.Log($"[Network] Client connected to server at {networkAddress}");
     }
 
     /// <summary>
@@ -231,9 +215,13 @@ public class MyNetworkManager : NetworkManager
     /// <para>This is called on the client when it disconnects from the server. Override this function to decide what happens when the client disconnects.</para>
     /// </summary>
     /// <param name="conn">Connection to the server.</param>
-    public override void OnClientDisconnect(NetworkConnection conn)
-    {
+    public override void OnClientDisconnect(NetworkConnection conn) {
         base.OnClientDisconnect(conn);
+
+        // Notify the UI that the connection dropped (e.g. Server down, KCP Timeout, Firewall block)
+        if (uiHandlerScript != null) {
+            uiHandlerScript.OnConnectionLost();
+        }
     }
 
     /// <summary>
@@ -263,7 +251,7 @@ public class MyNetworkManager : NetworkManager
     /// <para>StartHost has multiple signatures, but they all cause this hook to be called.</para>
     /// </summary>
     public override void OnStartHost() {
-        
+
 
     }
 
@@ -277,13 +265,12 @@ public class MyNetworkManager : NetworkManager
         myAuthenticatetor.ConnectToSql();  // connect the server to the sql database
     }
 
-    
+
 
     /// <summary>
     /// This is invoked when the client is started.
     /// </summary>
-    public override void OnStartClient() {
-    }
+    public override void OnStartClient() { }
 
 
     /// <summary>
@@ -301,6 +288,42 @@ public class MyNetworkManager : NetworkManager
     /// </summary>
     public override void OnStopClient() { }
 
+
+    #endregion
+
+    #region Custom Network Configuration
+
+    /// <summary>
+    /// Determines the correct server address based on CI/CD config or Command Line arguments.
+    /// </summary>
+    private string GetServerAddress() {
+        // Fallback (The ultimate default - Production)
+        string finalAddress = PROD_SERVER_ADDRESS;
+
+        // Read from CI/CD injected config (JSON)
+        string configPath = Path.Combine(Application.streamingAssetsPath, "config.json");
+        if (File.Exists(configPath)) {
+            string json = File.ReadAllText(configPath);
+            ServerConfig config = JsonUtility.FromJson<ServerConfig>(json);
+
+            if (!string.IsNullOrEmpty(config.serverAddress)) {
+                finalAddress = config.serverAddress;
+            }
+        }
+
+        // Command Line Override (For local developer testing)
+        string[] args = System.Environment.GetCommandLineArgs();
+        for (int i = 0; i < args.Length; i++) {
+            if (args[i] == "-server" && args.Length > i + 1) {
+                finalAddress = args[i + 1];
+                Debug.Log($"[DevOps] Overriding server address via CMD to: {finalAddress}");
+                break;
+            }
+        }
+
+        Debug.Log($"[Network] Connecting to: {finalAddress}");
+        return finalAddress;
+    }
 
     #endregion
 }

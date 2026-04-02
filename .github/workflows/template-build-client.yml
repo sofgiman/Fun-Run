@@ -10,7 +10,10 @@ on:
         required: true
         type: string
       buildName:
-        default: "Fun Run Client"
+        default: "Fun Run"
+        type: string
+      serverAddress:
+        required: true
         type: string
     outputs:
       os: 
@@ -38,6 +41,15 @@ jobs:
           path: Library
           key: Library-Client-${{ inputs.targetPlatform }}
           restore-keys: Library-Client-${{ inputs.targetPlatform }}
+
+      - name: Inject Environment Config
+        run: |
+          # Create the StreamingAssets folder if it doesn't exist
+          mkdir -p Assets/StreamingAssets
+          # Inject the server address from the workflow input into a JSON config file
+          echo '{"serverAddress": "${{ inputs.serverAddress }}"}' > Assets/StreamingAssets/config.json
+          # Print the file content to the GitHub Actions log for debugging and verification
+          cat Assets/StreamingAssets/config.json
 
       - name: Build Unity Project
         uses: game-ci/unity-builder@v4
