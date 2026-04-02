@@ -79,6 +79,11 @@ crashlytics-build.properties
 # MacOS
 .DS_Store
 
+# Ignore local SQLite databases
+*.sqlite
+*.db
+MyDatabase.sqlite
+
 # Terraform files
 *.tfstate
 *.tfstate.*
