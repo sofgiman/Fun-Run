@@ -1,0 +1,38 @@
+name: "[Dev] Client"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  mac_build:
+    uses: ./.github/workflows/template-build-client.yml
+    with:
+      os: "macos"
+      targetPlatform: "StandaloneOSX"
+      buildName: "Fun Run Dev"
+      serverAddress: "fun-run-dev.idanyafe.com"
+    secrets: inherit
+
+  linux_build: 
+    uses: ./.github/workflows/template-build-client.yml
+    with:
+      os: "ubuntu"
+      targetPlatform: "StandaloneLinux64"
+      buildName: "Fun Run Dev"
+      serverAddress: "fun-run-dev.idanyafe.com"
+    secrets: inherit
+
+  windows_build:
+    uses: ./.github/workflows/template-build-client.yml
+    with:
+      os: "windows"
+      targetPlatform: "StandaloneWindows64"
+      buildName: "Fun Run Dev"
+      serverAddress: "fun-run-dev.idanyafe.com"
+    secrets: inherit
