@@ -84,6 +84,9 @@ crashlytics-build.properties
 *.db
 MyDatabase.sqlite
 
+# CI/CD Generated Configurations
+Assets/StreamingAssets/config.json
+
 # Terraform files
 *.tfstate
 *.tfstate.*
