@@ -17,10 +17,14 @@ using Mirror;
 
 public class MyNetworkManager : NetworkManager {
 
+    // The maximum time (in seconds) to wait for the OS to resolve the DNS and bind the socket before forcing a disconnect
+    private const float DNS_RESOLUTION_TIMEOUT = 15f;
     private GameObject uiHandlerGameObject;
     private UIHandler uiHandlerScript;
     private MyAuthentication myAuthenticatetor;
     private const string PROD_SERVER_ADDRESS = "fun-run.idanyafe.com";
+    // Reference to the active DNS timeout coroutine so it can be safely canceled upon successful connection or manual disconnect
+    private Coroutine dnsTimeoutCoroutine;
 
     #region Unity Callbacks
 
@@ -49,7 +53,7 @@ public class MyNetworkManager : NetworkManager {
         if (!NetworkServer.active) {  // if server not active then connect to client
 
 #if UNITY_EDITOR
-            Debug.Log("[Network] Running in Editor. Defaulting to localhost.");
+            Debug.Log("[Network] Running in Editor. Defaulting to localhost");
             networkAddress = "localhost";
 #else
             networkAddress = GetServerAddress();
@@ -208,6 +212,12 @@ public class MyNetworkManager : NetworkManager {
     /// <param name="conn">Connection to the server.</param>
     public override void OnClientConnect(NetworkConnection conn) {
         Debug.Log($"[Network] Client connected to server at {networkAddress}");
+
+        // Cancel the DNS timeout coroutine since the socket successfully connected
+        if (dnsTimeoutCoroutine != null) {
+            StopCoroutine(dnsTimeoutCoroutine);
+            dnsTimeoutCoroutine = null;
+        }
     }
 
     /// <summary>
@@ -217,6 +227,13 @@ public class MyNetworkManager : NetworkManager {
     /// <param name="conn">Connection to the server.</param>
     public override void OnClientDisconnect(NetworkConnection conn) {
         base.OnClientDisconnect(conn);
+        Debug.Log("[Network] Client disconnected from server.");
+
+        // Cancel the DNS timeout coroutine if a disconnect occurs naturally before the timeout is reached
+        if (dnsTimeoutCoroutine != null) {
+            StopCoroutine(dnsTimeoutCoroutine);
+            dnsTimeoutCoroutine = null;
+        }
 
         // Notify the UI that the connection dropped (e.g. Server down, KCP Timeout, Firewall block)
         if (uiHandlerScript != null) {
@@ -260,7 +277,7 @@ public class MyNetworkManager : NetworkManager {
     /// <para>StartServer has multiple signatures, but they all cause this hook to be called.</para>
     /// </summary>
     public override void OnStartServer() {
-        print("server started");
+        Debug.Log("server started");
         myAuthenticatetor = GetComponent<MyAuthentication>();
         myAuthenticatetor.ConnectToSql();  // connect the server to the sql database
     }
@@ -270,7 +287,12 @@ public class MyNetworkManager : NetworkManager {
     /// <summary>
     /// This is invoked when the client is started.
     /// </summary>
-    public override void OnStartClient() { }
+    public override void OnStartClient() {
+        Debug.Log("[Network] Starting client connection process");
+
+        // Start a manual timeout coroutine specifically to prevent indefinite hangs during DNS resolution
+        dnsTimeoutCoroutine = StartCoroutine(DnsResolutionTimeout(DNS_RESOLUTION_TIMEOUT));
+    }
 
 
     /// <summary>
@@ -325,5 +347,26 @@ public class MyNetworkManager : NetworkManager {
         return finalAddress;
     }
 
+    /// <summary>
+    /// Coroutine that acts as a failsafe timeout during the client connection phase.
+    /// Specifically resolves edge cases where the OS hangs indefinitely during DNS resolution, bypassing Mirror's transport timeout.
+    /// </summary>
+    /// <param name="timeoutDuration">The maximum time to wait before forcing a disconnect.</param>
+    private IEnumerator DnsResolutionTimeout(float timeoutDuration) {
+        yield return new WaitForSeconds(timeoutDuration);
+
+        if (!NetworkClient.isConnected) {
+            Debug.LogWarning($"[Network] DNS resolution timed out after {timeoutDuration} seconds. Forcing disconnect");
+
+            // Abort Mirror's internal connection attempt
+            StopClient();
+
+            // Explicitly notify the UI to Fail Fast, in case StopClient doesn't trigger OnClientDisconnect
+            if (uiHandlerScript != null) {
+                uiHandlerScript.OnConnectionLost();
+            }
+        }
+        dnsTimeoutCoroutine = null;
+    }
     #endregion
 }
