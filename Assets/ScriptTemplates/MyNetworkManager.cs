@@ -18,7 +18,7 @@ using Mirror;
 public class MyNetworkManager : NetworkManager {
 
     // The maximum time (in seconds) to wait for the OS to resolve the DNS and bind the socket before forcing a disconnect
-    private const float DNS_RESOLUTION_TIMEOUT = 15f;
+    private const float DNS_RESOLUTION_TIMEOUT = 12f;
     private GameObject uiHandlerGameObject;
     private UIHandler uiHandlerScript;
     private MyAuthentication myAuthenticatetor;
