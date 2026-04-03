@@ -127,7 +127,7 @@ public class UIHandler : MonoBehaviour {
 
     // Called from MyNetworkManager when the connection to the server is lost (or blocked by firewall)
     public void OnConnectionLost() {
-        Debug.LogWarning("[Network] Connection lost. Triggering Fail Fast.");
+        Debug.LogWarning("[Network] Connection lost, triggering Fail Fast");
         requireRestart = true; // force fail fast
 
         signUpCanvas.SetActive(false);
