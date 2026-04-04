@@ -10,7 +10,25 @@ on:
       - main
 
 jobs:
+  verify_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ensure tag is from main
+        if: github.event_name != 'pull_request'
+        run: |
+          TAG_COMMIT=$(git rev-list -n 1 "${{ github.ref_name }}")
+          if git merge-base --is-ancestor "$TAG_COMMIT" origin/main; then
+            echo "Tag ${{ github.ref_name }} is from main. Proceeding."
+          else
+            echo "ERROR: Tag ${{ github.ref_name }} was not created from main!"
+            exit 1
+          fi
+
   mac_build:
+    needs: verify_branch
     uses: ./.github/workflows/template-build-client.yml
     with:
       os: "macos"
@@ -20,6 +38,7 @@ jobs:
     secrets: inherit
 
   linux_build: 
+    needs: verify_branch
     uses: ./.github/workflows/template-build-client.yml
     with:
       os: "ubuntu"
@@ -29,6 +48,7 @@ jobs:
     secrets: inherit
 
   windows_build:
+    needs: verify_branch
     uses: ./.github/workflows/template-build-client.yml
     with:
       os: "windows"
