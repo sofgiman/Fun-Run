@@ -27,8 +27,8 @@ locals {
 }
 
 module "ecs_app" {
-  source      = "../../modules/ecs_app"
-  
+  source = "../../modules/ecs_app"
+
   # Core
   project     = var.core_config.project
   environment = var.core_config.environment
@@ -49,9 +49,10 @@ module "ecs_app" {
   cpu                    = var.app_config.cpu
   memory                 = var.app_config.memory
   readonlyRootFilesystem = var.app_config.readonlyRootFilesystem
-  desired_count          = var.app_config.desired_count
-  efs_mount_path         = var.app_config.efs_mount_path
-  
+  # Use CLI override if provided, otherwise fallback to app_config tfvars
+  desired_count  = var.desired_count_override != null ? var.desired_count_override : var.app_config.desired_count
+  efs_mount_path = var.app_config.efs_mount_path
+
   # CI/CD Injected
   image_uri       = var.image_uri
   git_commit_hash = var.git_commit_hash
@@ -61,7 +62,7 @@ module "ecs_app" {
   protocol                  = var.network_config.server_protocol
   assign_public_ip          = var.network_config.assign_public_ip
   health_check_grace_period = var.network_config.health_check_grace_period
-  
+
   # Defaults/Hardcoded
   enable_execute_command = true
   log_retention_days     = 30
