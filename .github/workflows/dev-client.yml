@@ -13,7 +13,7 @@ jobs:
   mac_build:
     uses: ./.github/workflows/template-build-client.yml
     with:
-      os: "macos"
+      os: "Mac"
       targetPlatform: "StandaloneOSX"
       buildName: "Fun Run Dev"
       serverAddress: "fun-run-dev.idanyafe.com"
@@ -22,7 +22,7 @@ jobs:
   linux_build: 
     uses: ./.github/workflows/template-build-client.yml
     with:
-      os: "ubuntu"
+      os: "Linux"
       targetPlatform: "StandaloneLinux64"
       buildName: "Fun Run Dev"
       serverAddress: "fun-run-dev.idanyafe.com"
@@ -31,7 +31,7 @@ jobs:
   windows_build:
     uses: ./.github/workflows/template-build-client.yml
     with:
-      os: "windows"
+      os: "Windows"
       targetPlatform: "StandaloneWindows64"
       buildName: "Fun Run Dev"
       serverAddress: "fun-run-dev.idanyafe.com"
