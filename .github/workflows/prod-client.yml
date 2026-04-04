@@ -36,3 +36,26 @@ jobs:
       buildName: "Fun Run"
       serverAddress: "fun-run.idanyafe.com"
     secrets: inherit
+
+  publish_release:
+    needs: [mac_build, linux_build, windows_build]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - run: |
+          cd artifacts
+          for folder in */; do
+            folder_name=${folder%/}
+            cd "$folder_name"
+            zip -r "../../${folder_name}.zip" .
+            cd ..
+          done
+          cd ..
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: "*.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
