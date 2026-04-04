@@ -13,14 +13,14 @@ jobs:
   linux_build: 
     uses: ./.github/workflows/template-build-server.yml
     with:
-      os: "ubuntu"
+      os: "Linux"
       targetPlatform: "StandaloneLinux64"
     secrets: inherit
   
   windows_build:
     uses: ./.github/workflows/template-build-server.yml
     with:
-      os: "windows"
+      os: "Windows"
       targetPlatform: "StandaloneWindows64"
     secrets: inherit
 

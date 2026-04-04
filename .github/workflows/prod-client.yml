@@ -31,7 +31,7 @@ jobs:
     needs: verify_branch
     uses: ./.github/workflows/template-build-client.yml
     with:
-      os: "macos"
+      os: "Mac"
       targetPlatform: "StandaloneOSX"
       buildName: "Fun Run"
       serverAddress: "fun-run.idanyafe.com"
@@ -41,7 +41,7 @@ jobs:
     needs: verify_branch
     uses: ./.github/workflows/template-build-client.yml
     with:
-      os: "ubuntu"
+      os: "Linux"
       targetPlatform: "StandaloneLinux64"
       buildName: "Fun Run"
       serverAddress: "fun-run.idanyafe.com"
@@ -51,7 +51,7 @@ jobs:
     needs: verify_branch
     uses: ./.github/workflows/template-build-client.yml
     with:
-      os: "windows"
+      os: "Windows"
       targetPlatform: "StandaloneWindows64"
       buildName: "Fun Run"
       serverAddress: "fun-run.idanyafe.com"
