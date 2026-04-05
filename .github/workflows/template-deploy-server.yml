@@ -73,7 +73,7 @@ jobs:
 
           EXTRA_ARGS=""
           if [ ! -z "${{ inputs.desired_count }}" ]; then
-            EXTRA_ARGS="-var=desired_count=${{ inputs.desired_count }}"
+            EXTRA_ARGS="-var=desired_count_override=${{ inputs.desired_count }}"
           fi
         
           terraform plan ${MODE_FLAG} -out=tfplan \

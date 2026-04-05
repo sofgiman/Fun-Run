@@ -41,3 +41,9 @@ variable "git_commit_hash" {
   type        = string
   default     = ""
 }
+
+variable "desired_count_override" {
+  description = "Override for the number of desired ECS tasks (used by CI/CD Stop Pipeline)"
+  type        = number
+  default     = null
+}
