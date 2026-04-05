@@ -49,7 +49,7 @@ jobs:
       isApply: ${{ !inputs.dry_run }}
       isDestroy: false
       stage: "prod"
-      terraformDir: "terraform/server/deploy"
+      terraformDir: "terraform/live/server"
       desired_count: "0"
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_PROD }}

@@ -30,7 +30,7 @@ jobs:
       isApply: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'dev' }}
       isDestroy: false
       stage: "dev"
-      terraformDir: "terraform/infrastructure/deploy"
+      terraformDir: "terraform/live/infrastructure"
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_DEV }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
@@ -51,7 +51,7 @@ jobs:
       isApply: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'dev' }}
       isDestroy: false
       stage: "dev"
-      terraformDir: terraform/server/deploy
+      terraformDir: terraform/live/server
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_DEV }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
