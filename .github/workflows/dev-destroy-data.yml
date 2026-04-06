@@ -1,10 +1,9 @@
-# Dev Environment Destroy
+# Dev Environment Data Destroy
 #
-# Destroys the Dev ECS server and underlying infrastructure.
+# Destroys the persistent data layer (EFS/Database).
 # Runs strictly from the 'dev' branch for AWS OIDC compliance.
-# Includes a safe 'Dry Run' mode to preview the Terraform plan.
 
-name: "[Dev] Destroy Environment"
+name: "[Dev] Destroy Environment Data"
 
 on:
   workflow_dispatch:
@@ -15,12 +14,12 @@ on:
         type: boolean
         default: true
       confirm_action:
-        description: 'Are you SURE you want to destroy the DEV environment? (Ignored if Dry Run)'
+        description: 'Are you SURE you want to delete all DEV DATA? (Ignored if Dry Run)'
         required: false
         type: boolean
         default: false
       verification_code:
-        description: 'Type "DESTROY" to confirm (Ignored if Dry Run)'
+        description: 'Type "DESTROY_DATA" to confirm (Ignored if Dry Run)'
         required: false
         type: string
 
@@ -46,37 +45,22 @@ jobs:
             exit 1
           fi
           
-          if [[ "${{ inputs.verification_code }}" != "DESTROY" ]]; then
-            echo "ERROR: You must type 'DESTROY' in the verification field."
-            exit 1
+          if [[ "${{ inputs.verification_code }}" != "DESTROY_DATA" ]]; then
+             echo "ERROR: You must type 'DESTROY_DATA' in the verification field to delete the DB."
+             exit 1
           fi
-          echo "User confirmation for actual destruction passed."
+          echo "User confirmation for actual DATA destruction passed."
 
-  destroy_server:
-    name: Destroy ECS Server
+  destroy_data:
+    name: Destroy Data Layer
     needs: safety_checks
-    uses: ./.github/workflows/template-deploy-server.yml
+    # Using the dedicated Data template!
+    uses: ./.github/workflows/template-deploy-data.yml
     with:
-      image_uri: "ignore"
-      git_commit_hash: "ignore"
-      # If dry_run is true, isApply becomes false (uses plan role)
       isApply: ${{ !inputs.dry_run }} 
       isDestroy: true  
       stage: "dev"
-      terraformDir: "terraform/live/server"
-    secrets: 
-      role_arn: ${{ secrets.AWS_ROLE_DEV }}
-      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
-
-  destroy_infra:
-    name: Destroy Infrastructure
-    needs: destroy_server 
-    uses: ./.github/workflows/template-deploy-infrastructure.yml 
-    with:
-      isApply: ${{ !inputs.dry_run }} 
-      isDestroy: true
-      stage: "dev"
-      terraformDir: "terraform/live/infrastructure"
+      terraformDir: "terraform/live/data"
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_DEV }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
