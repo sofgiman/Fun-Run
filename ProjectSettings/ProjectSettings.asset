@@ -303,7 +303,7 @@ PlayerSettings:
       m_Height: 1024
       m_Kind: 0
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: e31098f10ac42491ab9989e11d0dc480, type: 3}
+      m_Icon: {fileID: 0}
       m_Width: 512
       m_Height: 512
       m_Kind: 0
@@ -336,6 +336,13 @@ PlayerSettings:
       m_Icon: {fileID: 0}
       m_Width: 16
       m_Height: 16
+      m_Kind: 0
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: 4278109f2d1cf4d15899d616181e6ded, type: 3}
+      m_Width: 128
+      m_Height: 128
       m_Kind: 0
   m_BuildTargetPlatformIcons: []
   m_BuildTargetBatching: []
