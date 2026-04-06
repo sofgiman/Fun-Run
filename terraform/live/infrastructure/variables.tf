@@ -1,9 +1,10 @@
 variable "core_config" {
   description = "Core configuration for the environment"
   type = object({
-    project     = string
-    environment = string
-    region      = string
+    project         = string
+    environment     = string
+    region          = string
+    tf_state_bucket = string
   })
 }
 

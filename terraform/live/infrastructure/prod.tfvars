@@ -3,6 +3,7 @@ core_config = {
   project     = "fun-run"
   environment = "prod"
   region      = "us-east-1"
+  tf_state_bucket = "fun-run-terraform-state"
 }
 
 network_config = {

@@ -1,14 +1,3 @@
-# The EFS Drive itself
-resource "aws_efs_file_system" "this" {
-  creation_token   = "${var.project}-${var.environment}-efs"
-  encrypted        = true
-  performance_mode = "generalPurpose"
-
-  tags = {
-    Name = "${var.project}-${var.environment}-efs"
-  }
-}
-
 # Security Group for EFS
 resource "aws_security_group" "efs_sg" {
   name        = "${var.project}-${var.environment}-efs-sg"
@@ -20,7 +9,7 @@ resource "aws_security_group" "efs_sg" {
     from_port   = 2049
     to_port     = 2049
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr] 
+    cidr_blocks = [var.vpc_cidr]
   }
 
   egress {
@@ -34,7 +23,7 @@ resource "aws_security_group" "efs_sg" {
 # Mount Targets (The "network plugs" inside your subnets)
 resource "aws_efs_mount_target" "this" {
   count           = length(var.subnets)
-  file_system_id  = aws_efs_file_system.this.id
+  file_system_id  = var.efs_id
   subnet_id       = var.subnets[count.index]
   security_groups = [aws_security_group.efs_sg.id]
 }
