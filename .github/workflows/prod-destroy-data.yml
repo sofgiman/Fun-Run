@@ -1,0 +1,77 @@
+# Prod Environment Data Destroy
+#
+# Destroys the persistent data layer (EFS/Database).
+# Runs strictly from the 'main' branch for AWS OIDC compliance.
+
+name: "[Prod] Destroy Environment Data"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry Run (Terraform Plan only - Safe)'
+        required: true
+        type: boolean
+        default: true
+      confirm_action:
+        description: 'Are you SURE you want to delete all PROD DATA? (Ignored if Dry Run)'
+        required: false
+        type: boolean
+        default: false
+      verification_code:
+        description: 'Type "DESTROY_DATA" to confirm (Ignored if Dry Run)'
+        required: false
+        type: string
+
+jobs:
+  safety_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Branch
+        run: |
+          # Ensure the workflow is only triggered from the main branch
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "ERROR: This workflow can only be run from the 'main' branch."
+            echo "Current branch: ${{ github.ref }}"
+            exit 1
+          fi
+          echo "Branch verification passed."
+
+      - name: Verify Authorized User (Only for Apply)
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          # Ensure only 'sofgiman' can actually destroy the Prod Data layer
+          if [[ "${{ github.actor }}" != "sofgiman" ]]; then
+            echo "ERROR: Unauthorized action. Only 'sofgiman' is allowed to destroy PROD DATA."
+            echo "Attempted by: ${{ github.actor }}"
+            exit 1
+          fi
+          echo "User authorization passed."
+
+      - name: Verify Confirmation (Only for Apply)
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          if [[ "${{ inputs.confirm_action }}" != "true" ]]; then
+            echo "ERROR: You must check the confirmation box to apply destroy."
+            exit 1
+          fi
+          
+          if [[ "${{ inputs.verification_code }}" != "DESTROY_DATA" ]]; then
+             echo "ERROR: You must type 'DESTROY_DATA' in the verification field to delete the DB."
+             exit 1
+          fi
+          echo "User confirmation for actual DATA destruction passed."
+
+  destroy_data:
+    name: Destroy Data Layer
+    needs: safety_checks
+    # Using the dedicated Data template!
+    uses: ./.github/workflows/template-deploy-data.yml
+    with:
+      isApply: ${{ !inputs.dry_run }} 
+      isDestroy: true  
+      stage: "prod"
+      terraformDir: "terraform/live/data"
+    secrets: 
+      role_arn: ${{ secrets.AWS_ROLE_PROD }}
+      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
