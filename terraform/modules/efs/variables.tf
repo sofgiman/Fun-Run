@@ -20,3 +20,8 @@ variable "subnets" {
   description = "List of subnet IDs to create mount targets in"
   type        = list(string)
 }
+
+variable "efs_id" {
+  description = "The ID of the external EFS file system"
+  type        = string
+}

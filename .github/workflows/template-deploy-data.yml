@@ -1,0 +1,71 @@
+name: "[Template] Terraform Deploy Data"
+
+permissions:
+  id-token: write
+
+on:
+  workflow_call:
+    inputs:
+      isApply:
+        required: true
+        type: boolean 
+      isDestroy: 
+        required: false
+        type: boolean
+        default: false
+      stage:  # dev/prod
+        required: true
+        type: string
+      terraformDir: 
+        required: true
+        type: string
+    secrets:
+      role_arn:
+        required: true
+      role_plan_arn:
+        required: true
+
+jobs:
+  terraform-apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.14.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ inputs.isApply && secrets.role_arn || secrets.role_plan_arn }}
+          aws-region: us-east-1
+
+      - name: Verify AWS Identity
+        run: |
+          echo "Connected as: $(aws sts get-caller-identity --query 'Arn' --output text | cut -d'/' -f2)"
+
+      - name: Terraform Init
+        working-directory: ${{ inputs.terraformDir }}
+        run: |
+          echo "Initializing Terraform using backend config file: backend-${{ inputs.stage }}.hcl"
+          terraform init -backend-config="backend-${{ inputs.stage }}.hcl" -reconfigure
+
+      - name: Terraform Plan
+        working-directory: ${{ inputs.terraformDir }}
+        run: |
+          MODE_FLAG=""
+          if [ "${{ inputs.isDestroy }}" == "true" ]; then
+            MODE_FLAG="-destroy"
+          fi
+
+          terraform plan ${MODE_FLAG} -out=tfplan \
+            -var-file="${{ inputs.stage }}.tfvars"
+
+      - name: Terraform Apply
+        if: ${{ inputs.isApply }}
+        working-directory: ${{ inputs.terraformDir }}
+        run: |
+            terraform apply -auto-approve tfplan 
