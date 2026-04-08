@@ -65,17 +65,40 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
-      - run: |
-          cd artifacts
-          for folder in */; do
-            folder_name=${folder%/}
-            cd "$folder_name"
-            zip -r "../../${folder_name}.zip" .
-            cd ..
-          done
-          cd ..
+
+      - name: Package Artifacts
+        run: |
+          mkdir -p final_assets
+
+          # Mac handling: Preserve executable permissions and symlinks
+          cd "artifacts/Fun-Run-Mac"
+          # Use 'find' to grant executable permissions to all contents within the .app bundle.
+          # This ensures both the main executable and internal frameworks (.dylib) can run.
+          find . -name "*.app" -type d -exec chmod -R +x {} \;
+          
+          # Note on 'zip -ry':
+          # '-r' is for recursive archiving.
+          # '-y' is crucial for macOS; it preserves symbolic links (symlinks) instead of 
+          # replacing them with the files they point to. Without '-y', the internal structure 
+          # of the Mac App bundle gets corrupted, resulting in an "App is damaged" error.
+          zip -ry "../../final_assets/Fun-Run-Mac.zip" .
+          cd ../..
+
+          # Linux handling: Set executable permissions
+          cd "artifacts/Fun-Run-Linux"
+          chmod +x ./*.x86_64
+          # Ensure internal shared objects (.so) also have executable permissions
+          find . -name "*.so" -type f -exec chmod +x {} \;
+          zip -r "../../final_assets/Fun-Run-Linux.zip" .
+          cd ../..
+
+          # Windows handling: Standard zip, no special POSIX permissions required
+          cd "artifacts/Fun-Run-Windows"
+          zip -r "../../final_assets/Fun-Run-Windows.zip" .
+          cd ../..
+
       - uses: softprops/action-gh-release@v1
         with:
-          files: "*.zip"
+          files: "final_assets/*.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
