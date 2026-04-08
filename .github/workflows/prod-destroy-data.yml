@@ -1,10 +1,9 @@
-# Prod Environment Destroy
+# Prod Environment Data Destroy
 #
-# Destroys the Prod ECS server and underlying infrastructure.
+# Destroys the persistent data layer (EFS/Database).
 # Runs strictly from the 'main' branch for AWS OIDC compliance.
-# Actual destruction is restricted to 'sofgiman'; 'Dry Run' is available for all.
 
-name: "[Prod] Destroy Environment"
+name: "[Prod] Destroy Environment Data"
 
 on:
   workflow_dispatch:
@@ -15,12 +14,12 @@ on:
         type: boolean
         default: true
       confirm_action:
-        description: 'Are you SURE you want to destroy the PROD environment? (Ignored if Dry Run)'
+        description: 'Are you SURE you want to delete all PROD DATA? (Ignored if Dry Run)'
         required: false
         type: boolean
         default: false
       verification_code:
-        description: 'Type "DESTROY" to confirm (Ignored if Dry Run)'
+        description: 'Type "DESTROY_DATA" to confirm (Ignored if Dry Run)'
         required: false
         type: string
 
@@ -31,7 +30,6 @@ jobs:
       - name: Verify Branch
         run: |
           # Ensure the workflow is only triggered from the main branch
-          # This prevents AWS STS AssumeRole failures due to OIDC trust policy
           if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
             echo "ERROR: This workflow can only be run from the 'main' branch."
             echo "Current branch: ${{ github.ref }}"
@@ -42,9 +40,9 @@ jobs:
       - name: Verify Authorized User (Only for Apply)
         if: ${{ inputs.dry_run == false }}
         run: |
-          # Ensure only 'sofgiman' can actually destroy the Prod environment
+          # Ensure only 'sofgiman' can actually destroy the Prod Data layer
           if [[ "${{ github.actor }}" != "sofgiman" ]]; then
-            echo "ERROR: Unauthorized action. Only 'sofgiman' is allowed to destroy PROD."
+            echo "ERROR: Unauthorized action. Only 'sofgiman' is allowed to destroy PROD DATA."
             echo "Attempted by: ${{ github.actor }}"
             exit 1
           fi
@@ -53,44 +51,27 @@ jobs:
       - name: Verify Confirmation (Only for Apply)
         if: ${{ inputs.dry_run == false }}
         run: |
-          # Validate user confirmation inputs before proceeding with destruction
           if [[ "${{ inputs.confirm_action }}" != "true" ]]; then
             echo "ERROR: You must check the confirmation box to apply destroy."
             exit 1
           fi
           
-          if [[ "${{ inputs.verification_code }}" != "DESTROY" ]]; then
-             echo "ERROR: You must type 'DESTROY' in the verification field."
+          if [[ "${{ inputs.verification_code }}" != "DESTROY_DATA" ]]; then
+             echo "ERROR: You must type 'DESTROY_DATA' in the verification field to delete the DB."
              exit 1
           fi
-          echo "User confirmation for actual destruction passed."
+          echo "User confirmation for actual DATA destruction passed."
 
-  destroy_server:
-    name: Destroy ECS Server
+  destroy_data:
+    name: Destroy Data Layer
     needs: safety_checks
-    uses: ./.github/workflows/template-deploy-server.yml
+    # Using the dedicated Data template!
+    uses: ./.github/workflows/template-deploy-data.yml
     with:
-      image_uri: "ignore"
-      git_commit_hash: "ignore"
-      # If dry_run is true, isApply becomes false (uses plan role)
       isApply: ${{ !inputs.dry_run }} 
       isDestroy: true  
       stage: "prod"
-      terraformDir: "terraform/live/server"
-    secrets: 
-      role_arn: ${{ secrets.AWS_ROLE_PROD }}
-      role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
-
-  destroy_infra:
-    name: Destroy Infrastructure
-    needs: destroy_server 
-    uses: ./.github/workflows/template-deploy-infrastructure.yml 
-    with:
-      # If dry_run is true, isApply becomes false (uses plan role)
-      isApply: ${{ !inputs.dry_run }} 
-      isDestroy: true
-      stage: "prod"
-      terraformDir: "terraform/live/infrastructure"
+      terraformDir: "terraform/live/data"
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_PROD }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}

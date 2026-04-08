@@ -1,19 +1,20 @@
-# prod.tfvars
+# dev.tfvars
 core_config = {
   project     = "fun-run"
-  environment = "prod"
+  environment = "dev"
   region      = "us-east-1"
+  tf_state_bucket = "fun-run-terraform-state"
 }
 
 network_config = {
-  vpc_cidr            = "10.1.0.0/16"
+  vpc_cidr            = "10.0.0.0/16"
   public_subnet_cidrs = [
-    "10.1.0.0/24"
+    "10.0.0.0/24"
   ]
 }
 
 nlb_config = {
   domain_name       = "idanyafe.com"
-  subdomain         = "fun-run"
+  subdomain         = "fun-run-dev"
   health_check_port = 80
 }

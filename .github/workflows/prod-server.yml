@@ -52,7 +52,7 @@ jobs:
       isApply: ${{ (github.event_name == 'push' && github.ref_type == 'tag') || (github.event_name == 'workflow_dispatch' && github.ref_name == 'main') }}
       isDestroy: false
       stage: "prod"
-      terraformDir: "terraform/infrastructure/deploy"
+      terraformDir: "terraform/live/infrastructure"
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_PROD }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
@@ -73,7 +73,7 @@ jobs:
       isApply: ${{ (github.event_name == 'push' && github.ref_type == 'tag') || (github.event_name == 'workflow_dispatch' && github.ref_name == 'main') }}
       isDestroy: false
       stage: "prod"
-      terraformDir: terraform/server/deploy
+      terraformDir: terraform/live/server
     secrets: 
       role_arn: ${{ secrets.AWS_ROLE_PROD }}
       role_plan_arn: ${{ secrets.AWS_ROLE_PLAN }}
