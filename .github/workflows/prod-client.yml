@@ -69,33 +69,24 @@ jobs:
       - name: Package Artifacts
         run: |
           mkdir -p final_assets
-
-          # Mac handling: Preserve executable permissions and symlinks
-          cd "artifacts/Fun-Run-Mac"
-          # Use 'find' to grant executable permissions to all contents within the .app bundle.
-          # This ensures both the main executable and internal frameworks (.dylib) can run.
-          find . -name "*.app" -type d -exec chmod -R +x {} \;
+          cd artifacts          
+          for folder in */; do
+            folder_name=${folder%/}
+            cd "$folder_name"
+            
+            if [[ "$folder_name" == *"Mac"* ]]; then
+              # Mac specific logic: preserve symlinks and enforce permissions
+              find . -name "*.app" -type d -exec chmod -R +x {} \;
+              zip -ry "../../final_assets/${folder_name}.zip" .
+            else
+              # Linux and Windows: standard recursive zip works fine
+              zip -r "../../final_assets/${folder_name}.zip" .
+            fi
+            
+            cd ..
+          done
           
-          # Note on 'zip -ry':
-          # '-r' is for recursive archiving.
-          # '-y' is crucial for macOS; it preserves symbolic links (symlinks) instead of 
-          # replacing them with the files they point to. Without '-y', the internal structure 
-          # of the Mac App bundle gets corrupted, resulting in an "App is damaged" error.
-          zip -ry "../../final_assets/Fun-Run-Mac.zip" .
-          cd ../..
-
-          # Linux handling: Set executable permissions
-          cd "artifacts/Fun-Run-Linux"
-          chmod +x ./*.x86_64
-          # Ensure internal shared objects (.so) also have executable permissions
-          find . -name "*.so" -type f -exec chmod +x {} \;
-          zip -r "../../final_assets/Fun-Run-Linux.zip" .
-          cd ../..
-
-          # Windows handling: Standard zip, no special POSIX permissions required
-          cd "artifacts/Fun-Run-Windows"
-          zip -r "../../final_assets/Fun-Run-Windows.zip" .
-          cd ../..
+          cd ..
 
       - uses: softprops/action-gh-release@v1
         with:
