@@ -10,6 +10,13 @@ on:
       - dev
 
 jobs:
+  mac_build:
+    uses: ./.github/workflows/template-build-server.yml
+    with:
+      os: "Mac"
+      targetPlatform: "StandaloneOSX"
+    secrets: inherit
+
   linux_build: 
     uses: ./.github/workflows/template-build-server.yml
     with:
